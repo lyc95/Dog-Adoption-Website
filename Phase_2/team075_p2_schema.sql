@@ -50,18 +50,6 @@ CREATE TABLE RejectedApplication
  FOREIGN KEY (email, application_date) REFERENCES AdoptionApplication (email, application_date) 
 ); 
  
-CREATE TABLE AdoptionDetails 
-( 
- adoptionDetailsID INT AUTO_INCREMENT PRIMARY KEY, 
- email varchar(255) NOT NULL, 
- application_date DATE NOT NULL, 
- adoption_date DATE NOT NULL, 
- adoption_fee DECIMAL(10, 2) NOT NULL CHECK (adoption_fee >= 0), 
- UNIQUE KEY (email, application_date, adoptionDetailsID), 
- FOREIGN KEY (email, application_date) 
- REFERENCES ApprovedApplication (email, application_date) ON DELETE CASCADE 
-); 
- 
 CREATE TABLE Surrender 
 ( 
  surrenderID INT AUTO_INCREMENT PRIMARY KEY 
@@ -95,6 +83,20 @@ CREATE TABLE DogBreed
  PRIMARY KEY (dogID, breedname), 
  FOREIGN KEY (dogID) REFERENCES Dog (dogID), 
  FOREIGN KEY (breedname) REFERENCES Breed (breedname) 
+); 
+
+CREATE TABLE AdoptionDetails 
+( 
+ adoptionDetailsID INT AUTO_INCREMENT PRIMARY KEY, 
+ email varchar(255) NOT NULL, 
+ application_date DATE NOT NULL, 
+ adoption_date DATE NOT NULL, 
+ adoption_fee DECIMAL(10, 2) NOT NULL CHECK (adoption_fee >= 0), 
+ dogID INT NOT NULL,
+ UNIQUE KEY (email, application_date, adoptionDetailsID), 
+ FOREIGN KEY (dogID) REFERENCES Dog (dogID),
+ FOREIGN KEY (email, application_date) 
+ REFERENCES ApprovedApplication (email, application_date) ON DELETE CASCADE 
 ); 
  
 CREATE TABLE Individual 
