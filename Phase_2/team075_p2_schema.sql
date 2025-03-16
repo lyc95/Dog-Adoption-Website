@@ -31,15 +31,7 @@ CREATE TABLE AdoptionApplication
  PRIMARY KEY (email, application_date), 
  FOREIGN KEY (email) REFERENCES Adopter (email) ON DELETE CASCADE 
 ); 
-CREATE TABLE ApprovedApplication 
-( 
- email varchar(255) NOT NULL, 
- application_date DATE NOT NULL, 
- application_state ENUM('APPROVED', 'MATCHED', 'ADOPTED') NOT NULL DEFAULT 'APPROVED', 
- date_approved DATE NOT NULL, 
- PRIMARY KEY (email, application_date), 
- FOREIGN KEY (email, application_date) REFERENCES AdoptionApplication (email, application_date) 
-); 
+
  
 CREATE TABLE RejectedApplication 
 ( 
@@ -69,6 +61,18 @@ CREATE TABLE Dog
  FOREIGN KEY (surrenderID) 
  REFERENCES Surrender (surrenderID) ON DELETE CASCADE 
 ); 
+
+CREATE TABLE ApprovedApplication 
+( 
+ email varchar(255) NOT NULL, 
+ application_date DATE NOT NULL, 
+ dogID INT NULL,
+ application_state ENUM('APPROVED', 'MATCHED', 'ADOPTED') NOT NULL DEFAULT 'APPROVED', 
+ date_approved DATE NOT NULL, 
+ PRIMARY KEY (email, application_date), 
+ FOREIGN KEY (dogID) REFERENCES Dog (dogID),
+ FOREIGN KEY (email, application_date) REFERENCES AdoptionApplication (email, application_date) 
+); 
  
 CREATE TABLE Breed 
 ( 
@@ -92,9 +96,7 @@ CREATE TABLE AdoptionDetails
  application_date DATE NOT NULL, 
  adoption_date DATE NOT NULL, 
  adoption_fee DECIMAL(10, 2) NOT NULL CHECK (adoption_fee >= 0), 
- dogID INT NOT NULL,
  UNIQUE KEY (email, application_date, adoptionDetailsID), 
- FOREIGN KEY (dogID) REFERENCES Dog (dogID),
  FOREIGN KEY (email, application_date) 
  REFERENCES ApprovedApplication (email, application_date) ON DELETE CASCADE 
 ); 
@@ -173,7 +175,7 @@ CREATE TABLE AdminUser
 CREATE TABLE CasualUser 
 (
     email varchar(255) NOT NULL, 
-    birthday date NOT NULL, 
+    birthday date NULL, 
     phone_number varchar(255) NOT NULL, 
     firstname varchar(255) NOT NULL, 
     lastname varchar(255) NOT NULL, 
