@@ -1,8 +1,7 @@
 package com.example.dogsdatabase.dao;
 
-import com.example.dogsdatabase.entity.User;
+import com.example.dogsdatabase.entity.po.UserPO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -35,25 +34,35 @@ public class UserDao {
         return jdbcTemplate.update(sql, email);
     }
 
-    public User getUserByEmail(String email){
-        String sql = "SELECT * FROM user WHERE email = ?";
+    public UserPO getUserByEmail(String email){
+        String sql = "SELECT email, password FROM user WHERE email = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, User.class, email);
+            return jdbcTemplate.queryForObject(sql,  new Object[]{email}, (rs, rowNum) ->
+                    new UserPO(rs.getString("email"), rs.getString("password"))
+            );
         } catch (Exception e) {
             return null;
         }
 
     }
 
-    public List<User> getAllUsers(){
-        String sql = "SELECT * FROM user";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            User user = new User();
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            return user;
-        });
+    public String getUserType(String email) {
+        String sql = "SELECT 'AdminUser' AS type FROM AdminUser WHERE email = ? " +
+                "UNION ALL SELECT 'Volunteer' FROM Volunteer WHERE email = ? " +
+                "UNION ALL SELECT 'ExecutiveDirector' FROM ExecutiveDirector WHERE email = ? " +
+                "LIMIT 1";
+        return jdbcTemplate.queryForObject(sql,  new Object[]{email, email, email}, String.class);
     }
+
+//    public List<UserPO> getAllUsers(){
+//        String sql = "SELECT * FROM user";
+//        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+//            UserPO userPO = new UserPO();
+//            UserPO.setEmail(rs.getString("email"));
+//            UserPO.setPassword(rs.getString("password"));
+//            return userPO;
+//        });
+//    }
 
 
 }

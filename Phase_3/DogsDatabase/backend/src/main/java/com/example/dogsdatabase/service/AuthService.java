@@ -2,10 +2,14 @@ package com.example.dogsdatabase.service;
 
 import com.example.dogsdatabase.dao.SystemConfigDao;
 import com.example.dogsdatabase.dao.UserDao;
-import com.example.dogsdatabase.entity.User;
+import com.example.dogsdatabase.entity.dto.LoginDTO;
+import com.example.dogsdatabase.entity.dto.UserDTO;
+import com.example.dogsdatabase.entity.po.UserPO;
+import com.example.dogsdatabase.entity.vo.LoginVO;
 import com.example.dogsdatabase.exception.AuthException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,28 +24,36 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserDao userDao;
     private final SystemConfigDao systemConfigDao;
+    private final JdbcTemplate jdbcTemplate;
 
-    public User login(String email, String password) {
-        User user = userDao.getUserByEmail(email);
+    public LoginVO login(LoginDTO loginDTO) {
+        UserPO user = userDao.getUserByEmail(loginDTO.getEmail());
         if (user == null) { // 用户不存在
             throw new AuthException("user don't exist!");
         }
-        if (user.getPassword() != password) { // 密码错误
+        if (!user.getPassword().equals(loginDTO.getPassword())) { // 密码错误
             throw new AuthException("wrong password!");
         }
-        if(systemConfigDao.getSystemConfigByName("loggedUser") != null){ // 用户已经登录
+        if(!systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value().equals("")){ // 用户已经登录
             throw new AuthException("user already logged in!");
         }
-        systemConfigDao.updateSystemConfig("loggedUser", email);
-        return user;
+        systemConfigDao.updateSystemConfig("loggedUser", loginDTO.getEmail());
+
+        return buildLoginVO(user);
     }
 
-    public User logout() {
-        User user = userDao.getUserByEmail(systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value());
-        if (user == null) { // 用户不存在
+    public UserPO logout() {
+        UserPO userPo = userDao.getUserByEmail(systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value());
+        if (userPo == null) { // 用户不存在
             throw new AuthException("user don't exist!");
         }
         systemConfigDao.updateSystemConfig("loggedUser", "");
-        return user;
+        return userPo;
+    }
+
+    private LoginVO buildLoginVO(UserPO user) {
+        String userType = userDao.getUserType(user.getEmail());
+
+        return new LoginVO(user.getEmail(), userType);
     }
 }

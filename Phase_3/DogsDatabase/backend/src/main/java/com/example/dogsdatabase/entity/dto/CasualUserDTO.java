@@ -1,4 +1,4 @@
-package com.example.dogsdatabase.entity;
+package com.example.dogsdatabase.entity.dto;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class CasualUser extends User{
+public class CasualUserDTO extends UserDTO {
     private String email;
     private String password;
     private String phone_number;

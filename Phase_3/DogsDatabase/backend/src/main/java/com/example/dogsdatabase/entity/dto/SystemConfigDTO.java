@@ -1,4 +1,4 @@
-package com.example.dogsdatabase.entity;
+package com.example.dogsdatabase.entity.dto;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class SystemConfig {
+public class SystemConfigDTO {
     private String configName;
     private String config_value;
 }
