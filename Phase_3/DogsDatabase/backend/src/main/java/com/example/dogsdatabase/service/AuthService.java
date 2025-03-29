@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserDao userDao;
     private final SystemConfigDao systemConfigDao;
-    private final JdbcTemplate jdbcTemplate;
 
     public LoginVO login(LoginDTO loginDTO) {
         UserPO user = userDao.getUserByEmail(loginDTO.getEmail());

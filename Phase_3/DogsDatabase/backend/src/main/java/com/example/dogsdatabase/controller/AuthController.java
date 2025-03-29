@@ -23,7 +23,7 @@ import java.util.Map;
  * @Date 2025/3/28 16:47
  * @description:
  */
-@RestController()
+@RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {

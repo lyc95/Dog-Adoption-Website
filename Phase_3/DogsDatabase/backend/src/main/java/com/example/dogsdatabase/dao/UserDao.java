@@ -54,15 +54,4 @@ public class UserDao {
         return jdbcTemplate.queryForObject(sql,  new Object[]{email, email, email}, String.class);
     }
 
-//    public List<UserPO> getAllUsers(){
-//        String sql = "SELECT * FROM user";
-//        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-//            UserPO userPO = new UserPO();
-//            UserPO.setEmail(rs.getString("email"));
-//            UserPO.setPassword(rs.getString("password"));
-//            return userPO;
-//        });
-//    }
-
-
 }

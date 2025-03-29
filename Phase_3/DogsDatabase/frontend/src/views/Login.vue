@@ -80,7 +80,7 @@ const handleLogin = async () => {
 
     if (res.code  === '200') {
       ElMessage.success('login success')
-      router.push('/dashboard')
+      await router.push('/dashboard')
     } else {
       ElMessage.error(res.msg  || 'login fail')
     }
