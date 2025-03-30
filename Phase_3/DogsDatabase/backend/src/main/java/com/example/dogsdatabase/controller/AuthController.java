@@ -43,13 +43,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public Result logout(){
-        UserPO logout;
         try {
-            logout = authService.logout();
+            authService.logout();
         }catch (AuthException e){
             return Result.error(e.getCode(), e.getMsg());
         }
-        return Result.success(logout);
+        return Result.success();
     }
 
 }

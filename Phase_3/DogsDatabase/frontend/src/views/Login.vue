@@ -82,7 +82,7 @@ const handleLogin = async () => {
       ElMessage.success('login success')
       await router.push('/dashboard')
     } else {
-      ElMessage.error(res.msg  || 'login fail')
+      ElMessage.error(res.msg)
     }
   } catch (error) {
     ElMessage.error('Interface call exception')
