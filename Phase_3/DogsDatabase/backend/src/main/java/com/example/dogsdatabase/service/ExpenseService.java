@@ -1,10 +1,10 @@
 package com.example.dogsdatabase.service;
-import java.sql.Date;
+import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.example.dogsdatabase.dao.ExpenseDAO;
 import com.example.dogsdatabase.entity.po.ExpensePO;
 
 import lombok.RequiredArgsConstructor;
@@ -12,66 +12,54 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
-
-    private final JdbcTemplate jdbcTemplate;
-
-    public List<ExpensePO> getAllExpensesByDogId(Integer dogId)
+    /* Expense Repository class */
+    private final ExpenseDAO expenseDAO;
+    
+    public void checkDogId(Integer dogId) throws Exception
     {
-        String sql = "SELECT * FROM Expense WHERE dogID = " + dogId;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new ExpensePO(
-            rs.getInt("dogID"),
-            rs.getString("vendor_name"),
-            rs.getString("category"),
-            rs.getDate("expense_date").toLocalDate(),
-            rs.getBigDecimal("amount")
-        ));
+        if (dogId < 0)
+        {
+            throw new Exception("Error: Invalid Dog Id");
+        }
+    }
+    public void checkAmount(BigDecimal amount) throws Exception
+    {
+        if (amount.doubleValue() <= 0.0)
+        {
+            throw new Exception("Error: negative amount value");
+        }
     }
 
-    public void addExpense(ExpensePO expense)
+    public List<ExpensePO> getAllExpensesByDogId(Integer dogId) throws Exception
     {
-        String sql = "INSERT INTO Expense (dogID, vendor_name, category, expense_date, amount) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, 
-            expense.getDogID(), 
-            expense.getVendorName(), 
-            expense.getCategory(), 
-            expense.getExpenseDate(), 
-            expense.getAmount());
+        checkDogId(dogId);
+        return expenseDAO.getAllExpensesByDogId(dogId);
     }
 
-    public Integer findExpensesByDogIdAndVendorAndExpenseDate(ExpensePO expense)
+    public void addExpense(ExpensePO expense) throws Exception
     {
-        String sql = "SELECT COUNT(*) FROM Expense WHERE dogID = ? AND vendor_name = ? AND expense_date = ?";
-        Integer rows = jdbcTemplate.queryForObject(sql, Integer.class, 
-            expense.getDogID(), 
-            expense.getVendorName(), 
-            Date.valueOf(expense.getExpenseDate())  // Convert LocalDate to SQL Date
-        );
-        // Return affected rows
-        return rows;
+
+        checkDogId(expense.getDogID());
+        checkAmount(expense.getAmount());
+        expenseDAO.addExpense(expense);
+    }
+
+    public Integer findExpensesByDogIdAndVendorAndExpenseDate(ExpensePO expense) throws Exception
+    {
+        checkDogId(expense.getDogID());
+        if (expense.getVendorName() == null || expense.getExpenseDate() == null)
+        {
+            throw new Exception("Error: Empty Vendor Name or ExpenseDate");
+        }
+        return expenseDAO.findExpensesByDogIdAndVendorAndExpenseDate(expense);
     }
     public Integer deleteExpense(ExpensePO expense)
     {
-        String sql = "DELETE FROM Expense WHERE dogID = ? AND vendor_name = ? AND expense_date = ? AND category = ?";
-        Integer rows = jdbcTemplate.update(sql, 
-            expense.getDogID(), 
-            expense.getVendorName(), 
-            Date.valueOf(expense.getExpenseDate()), 
-            expense.getCategory()
-        );
-        // Return affected rows
-        return rows;
+        return expenseDAO.deleteExpense(expense);
     }
-    public Integer updateExpense(ExpensePO expense)
+    public Integer updateExpense(ExpensePO expense) throws Exception
     {
-        String sql = "Update Expense SET amount = ? WHERE dogID = ? AND vendor_name = ? AND expense_date = ? AND category = ?";
-        Integer rows = jdbcTemplate.update(sql,
-            expense.getAmount(),
-            expense.getDogID(), 
-            expense.getVendorName(), 
-            Date.valueOf(expense.getExpenseDate()), 
-            expense.getCategory()
-        );
-        // Return affected rows
-        return rows;
+        checkAmount(expense.getAmount());
+        return expenseDAO.updateExpense(expense);
     }
 }

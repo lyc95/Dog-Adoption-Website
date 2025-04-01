@@ -1,9 +1,9 @@
 package com.example.dogsdatabase.service;
 import java.util.List;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.example.dogsdatabase.dao.MicrochipDAO;
 import com.example.dogsdatabase.entity.po.MicrochipPO;
 import com.example.dogsdatabase.entity.po.MicrochipVendorPO;
 
@@ -13,76 +13,63 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MicrochipService {
 
-    private final JdbcTemplate jdbcTemplate;
+    /* Repository for  MicroChip */
+    private final MicrochipDAO microchipDAO;
 
+    public void checkVendorExisted(String vendorName) throws Exception
+    {
+        if (microchipDAO.findMicrochipVendor(vendorName).isEmpty())
+        {
+            throw new Exception("Error: Microchip Vendor name is not existed");
+        }
+
+    }
     public Integer addMicrochip(MicrochipPO microchipPO) throws Exception
     {
         if (checkMicrochipForDog(microchipPO.getDogID()))
         {
-            throw new Exception("The dog had resgistered Microchip already with dogId = " + microchipPO.getDogID());
+            throw new Exception("Error: The dog had resgistered Microchip already with dogId = " + microchipPO.getDogID());
         }
-        String sql = "INSERT INTO microchip (microchipID, dogID, manufacture_name) VALUES (?, ?, ?)";
-        Integer rows = jdbcTemplate.update(sql, 
-            microchipPO.getMicrochipID(), 
-            microchipPO.getDogID(), 
-            microchipPO.getManufactureName()
-        );
-        /* Return affected rows */
-        return rows;
+        checkVendorExisted(microchipPO.getManufactureName());
+        return microchipDAO.addMicrochip(microchipPO);
     }
     public Boolean checkMicrochipForDog(Integer dogId)
     {
-        String sql = "SELECT * FROM microchip WHERE dogID = ?";
-        List<MicrochipPO> result = jdbcTemplate.query(sql, (rs, rowNum) -> new MicrochipPO(
-            rs.getString("microchipID"),
-            rs.getInt("dogID"),
-            rs.getString("manufacture_name")
-        ), dogId);
-        /* Return True of dod had Microchip registered otherwise return false*/
-        return !result.isEmpty();
+        /* Return True if dog had Microchip registered otherwise return false*/
+        return !microchipDAO.getMicrochipForDog(dogId).isEmpty();
     }
-    public Integer updateMicrochip(MicrochipPO microchipPO)
+    public Integer updateMicrochip(MicrochipPO microchipPO) throws Exception
     {
-        /* To update DogId and manufacture_name*/
-        String sql = "UPDATE microchip SET dogID = ?, manufacture_name = ? WHERE microchipID = ?";
-        Integer rows = jdbcTemplate.update(sql,
-            microchipPO.getDogID(),
-            microchipPO.getManufactureName(),
-            microchipPO.getMicrochipID()
-        );
-        /* Return affected rows */
-        return rows;
+        checkVendorExisted(microchipPO.getManufactureName());
+        return microchipDAO.updateMicrochip(microchipPO);
     }
-    public List<MicrochipPO> getMicrochip(String microchipID)
+    public List<MicrochipPO> getMicrochip(String microchipID) throws Exception
     {
-        String sql = "SELECT * FROM microchip WHERE microchipID = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new MicrochipPO(
-            rs.getString("microchipID"),
-            rs.getInt("dogID"),
-            rs.getString("manufacture_name")
-        ), microchipID);
+        if (microchipID == null)
+        {
+            throw new Exception("Error: microchipID can not bu null");
+        }
+        return microchipDAO.getMicrochip(microchipID);
     }
-    public Integer deleteMicrochip(String microchipID)
+    public Integer deleteMicrochip(String microchipID) throws Exception
     {
-        String sql = "DELETE FROM microchip WHERE microchipID = ?";
-        Integer rows = jdbcTemplate.update(sql, microchipID);
-        /* Return affected rows */
-        return rows;
+        if (microchipID == null)
+        {
+            throw new Exception("Error: microchipID can not bu null");
+        }
+        return microchipDAO.deleteMicrochip(microchipID);
     }
     public List<MicrochipVendorPO> getMicrochipVendors()
     {
-        String sql = "SELECT * FROM microchipvendor";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new MicrochipVendorPO(rs.getString("manufacture_name")));
+        return microchipDAO.getMicrochipVendors();
     }
 
     public List<MicrochipVendorPO> getMicrochipVendors(String pattern)
     {
         if (pattern == null || pattern.isEmpty())
         {
-            return getMicrochipVendors();
+            return microchipDAO.getMicrochipVendors();
         }
-        String matchPattern = "%" + pattern + "%";
-        String sql = "SELECT * FROM microchipvendor WHERE manufacture_name LIKE ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new MicrochipVendorPO(rs.getString("manufacture_name")), matchPattern);
+        return microchipDAO.getMicrochipVendors(pattern);
     }
 }
