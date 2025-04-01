@@ -4,6 +4,17 @@
   </div>
 </template>
 
+<script setup>
+import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+onMounted(() => {
+  const route = useRoute()
+  console.log(' 接收到的dogID:', route.query.dogID)
+
+})
+</script>
+
 <style scoped>
 .viewdetails {
   display: flex;

@@ -15,10 +15,10 @@
           <el-table-column prop="alteration_status" label="Alteration Status" width="'auto'" />
           <el-table-column prop="age_when_surrender" label="Age" width="'auto'" />
           <el-table-column prop="adoption_state" label="Adoption Status" width="'auto'" />
-          <el-table-column prop="surrender_date" label="Surrender Date" width="'auto'" />
           <el-table-column fixed="right" label="Operations" min-width="120">
-            <template #default>
-              <el-button @click="viewDetailsClick">View Details</el-button>
+            <template #default="scope">
+              <!-- 通过scope.row 传递当前行数据 -->
+              <el-button @click="viewDetailsClick(scope.row)">View  Details</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -50,6 +50,7 @@
   import { reactive } from 'vue'
   import request from "@/utils/request.js";
   import {ElMessage} from "element-plus";
+  import { useRouter } from 'vue-router'
 
   const data = reactive({
     //访问/api/dog/all获取数据
@@ -63,9 +64,16 @@
     })
   }
 
-  const viewDetailsClick = () => {
-    console.log("viewDetailsClick")
-
+  const viewDetailsClick = (rowData) => {
+    const router = useRouter()
+    router.push({
+      path: '/viewDetails',
+      query: {
+        dogID: rowData.dogID,   // 传递目标参数
+        // 可附加其他字段（可选）
+        name: rowData.name
+      }
+    })
   }
   const addDogClick = () => {
     console.log("addDogClick")
