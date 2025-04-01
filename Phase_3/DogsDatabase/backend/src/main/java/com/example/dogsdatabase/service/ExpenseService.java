@@ -1,0 +1,77 @@
+package com.example.dogsdatabase.service;
+import java.sql.Date;
+import java.util.List;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+import com.example.dogsdatabase.entity.po.ExpensePO;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ExpenseService {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public List<ExpensePO> getAllExpensesByDogId(Integer dogId)
+    {
+        String sql = "SELECT * FROM Expense WHERE dogID = " + dogId;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new ExpensePO(
+            rs.getInt("dogID"),
+            rs.getString("vendor_name"),
+            rs.getString("category"),
+            rs.getDate("expense_date").toLocalDate(),
+            rs.getBigDecimal("amount")
+        ));
+    }
+
+    public void addExpense(ExpensePO expense)
+    {
+        String sql = "INSERT INTO Expense (dogID, vendor_name, category, expense_date, amount) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, 
+            expense.getDogID(), 
+            expense.getVendorName(), 
+            expense.getCategory(), 
+            expense.getExpenseDate(), 
+            expense.getAmount());
+    }
+
+    public Integer findExpensesByDogIdAndVendorAndExpenseDate(ExpensePO expense)
+    {
+        String sql = "SELECT COUNT(*) FROM Expense WHERE dogID = ? AND vendor_name = ? AND expense_date = ?";
+        Integer rows = jdbcTemplate.queryForObject(sql, Integer.class, 
+            expense.getDogID(), 
+            expense.getVendorName(), 
+            Date.valueOf(expense.getExpenseDate())  // Convert LocalDate to SQL Date
+        );
+        // Return affected rows
+        return rows;
+    }
+    public Integer deleteExpense(ExpensePO expense)
+    {
+        String sql = "DELETE FROM Expense WHERE dogID = ? AND vendor_name = ? AND expense_date = ? AND category = ?";
+        Integer rows = jdbcTemplate.update(sql, 
+            expense.getDogID(), 
+            expense.getVendorName(), 
+            Date.valueOf(expense.getExpenseDate()), 
+            expense.getCategory()
+        );
+        // Return affected rows
+        return rows;
+    }
+    public Integer updateExpense(ExpensePO expense)
+    {
+        String sql = "Update Expense SET amount = ? WHERE dogID = ? AND vendor_name = ? AND expense_date = ? AND category = ?";
+        Integer rows = jdbcTemplate.update(sql,
+            expense.getAmount(),
+            expense.getDogID(), 
+            expense.getVendorName(), 
+            Date.valueOf(expense.getExpenseDate()), 
+            expense.getCategory()
+        );
+        // Return affected rows
+        return rows;
+    }
+}
