@@ -1,16 +1,21 @@
 package com.example.dogsdatabase.service;
 
-import com.example.dogsdatabase.dao.DogDao;
-import com.example.dogsdatabase.entity.po.DogBreedPO;
-import com.example.dogsdatabase.entity.po.DogPO;
-import com.example.dogsdatabase.entity.vo.DogVO;
-import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.dogsdatabase.dao.DogDao;
+import com.example.dogsdatabase.dao.ExpenseDAO;
+import com.example.dogsdatabase.entity.po.DogPO;
+import com.example.dogsdatabase.entity.vo.DogReportVO;
+import com.example.dogsdatabase.entity.vo.DogVO;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @Title: DogService
@@ -22,7 +27,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DogService {
+
     private final DogDao dogDao;
+    private final ExpenseDAO expenseDAO;
     private final JdbcTemplate jdbcTemplate;
 
     public int insertDog(DogVO dog) {
@@ -76,7 +83,23 @@ public class DogService {
         // 4. 使用StringJoiner优化字符串拼接（JDK8+）
         return dogBreeds.isEmpty()  ? "" : String.join(",",  dogBreeds);
     }
-
-
-
+    public List<DogReportVO> getAllDogsSurrenderedByLACDInMonth(YearMonth yearMonth)
+    {
+        return dogDao.getAllDogsSurrenderedByLACDInMonth(yearMonth);
+    }
+    public List<DogReportVO> getAllDogsdogsAdoptedAfter60DaysInMonth(YearMonth yearMonth)
+    {
+        return dogDao.getAllDogsdogsAdoptedAfter60DaysInMonth(yearMonth);
+    }
+    public List<DogReportVO> getAllDogsAdoptedWithExpensesInMonth(YearMonth yearMonth)
+    {
+        List<DogReportVO> dogList = dogDao.getAllDogsAdoptedWithoutExpensesInMonth(yearMonth);
+        /* Calculate total expenses for each dog*/
+        for (DogReportVO dog : dogList)
+        {
+            BigDecimal totalAmount = expenseDAO.getTotalExpensesByDogId(dog.getDogID());
+            dog.setTotalExpenses(totalAmount);
+        }
+        return dogList;
+    }
 }

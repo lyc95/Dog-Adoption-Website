@@ -1,4 +1,5 @@
 package com.example.dogsdatabase.dao;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -28,6 +29,13 @@ public class ExpenseDAO {
         ));
     }
 
+    public BigDecimal getTotalExpensesByDogId(Integer dogId)
+    {
+        String sql = "SELECT SUM(amount) as total_expenses FROM Expense WHERE dogID = ?";
+        BigDecimal totalExpenses = jdbcTemplate.queryForObject(sql, BigDecimal.class, dogId);
+        return totalExpenses != null ? totalExpenses : BigDecimal.ZERO;
+    }
+    
     public void addExpense(ExpensePO expense)
     {
         String sql = "INSERT INTO Expense (dogID, vendor_name, category, expense_date, amount) VALUES (?, ?, ?, ?, ?)";
