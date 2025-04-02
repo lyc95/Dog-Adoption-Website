@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.dogsdatabase.common.Result;
+import com.example.dogsdatabase.entity.vo.BirthdayReportItemVO;
+import com.example.dogsdatabase.entity.vo.ExpenseAnalysisReportItemVO;
 import com.example.dogsdatabase.entity.vo.LACDReportVO;
+import com.example.dogsdatabase.entity.vo.MonthlyAdoptionReportItemVO;
+import com.example.dogsdatabase.entity.vo.VolunteerLookUpItemVO;
 import com.example.dogsdatabase.service.ReportService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,8 +43,8 @@ public class ReportController {
     public Result getMonthlyAdoptionReport()
     {
         try {
-
-            return Result.success();
+            List<MonthlyAdoptionReportItemVO> resultList = reportService.getMonthlyAdoptionReport();
+            return Result.success(resultList);
         } catch (Exception e) {
             return Result.error("500", e.getMessage());
         }
@@ -49,8 +53,8 @@ public class ReportController {
     public Result getExpenseAnalysisReport()
     {
         try {
-
-            return Result.success();
+            List<ExpenseAnalysisReportItemVO> resultList = reportService.getExpenseAnalysisReport();
+            return Result.success(resultList);
         } catch (Exception e) {
             return Result.error("500", e.getMessage());
         }
@@ -60,7 +64,8 @@ public class ReportController {
     {
         try {
             String searchPattern = pattern.orElse("");
-            return Result.success(searchPattern);
+            List<VolunteerLookUpItemVO> resultList = reportService.getVolunteers(searchPattern);
+            return Result.success(resultList);
         } catch (Exception e) {
             return Result.error("500", e.getMessage());
         }
@@ -71,7 +76,8 @@ public class ReportController {
     {
         try {
             YearMonth yearMonth = YearMonth.of(year, month);
-            return Result.success(yearMonth);
+            List<BirthdayReportItemVO> resultList = reportService.getVolunteerBirthdayReport(yearMonth); 
+            return Result.success(resultList);
         } catch (Exception e) {
             return Result.error("500", e.getMessage());
         }

@@ -173,13 +173,12 @@ public class DogDao {
     
     public List<DogReportVO> getAllDogsSurrenderedByLACDInMonth(YearMonth yearMonth)
     {
-        System.out.println("Year: " + yearMonth.getYear() + ", Month: " + yearMonth.getMonthValue());
         String sql = "SELECT dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds " +
                     "FROM dog NATURAL JOIN localanimalcontroldepartment " + 
                     "LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID " + 
                     "LEFT JOIN microchip ON dog.dogID = microchip.dogID " + 
                     "WHERE YEAR(dog.surrender_date) = ? AND MONTH(dog.surrender_date) = ? " +
-                    "GROUP BY dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date";
+                    "GROUP BY dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date ORDER BY dog.dogID";
         List<DogReportVO> dogList = jdbcTemplate.query(sql, (rs, rowNum) -> {
             DogReportVO dogReportVO = new DogReportVO();
             dogReportVO.setDogID(rs.getInt("dogID"));
@@ -205,7 +204,8 @@ public class DogDao {
                     "LEFT JOIN microchip ON dog.dogID = microchip.dogID " + 
                     "WHERE YEAR(adoptiondetails.adoption_date) = ? AND MONTH(adoptiondetails.adoption_date) = ? " + 
                     "AND DATEDIFF(adoptiondetails.adoption_date, dog.surrender_date) + 1 >= 60 " + 
-                    "GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date";
+                    "GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date " +
+                    "ORDER BY days_in_rescue DESC";
         List<DogReportVO> dogList = jdbcTemplate.query(sql, (rs, rowNum) -> {
             DogReportVO dogReportVO = new DogReportVO();
             dogReportVO.setDogID(rs.getInt("dogID"));
@@ -237,7 +237,7 @@ public class DogDao {
                     "LEFT JOIN individual ON dog.surrenderID = individual.surrenderID " +
                     "LEFT JOIN localanimalcontroldepartment ON dog.surrenderID = localanimalcontroldepartment.surrenderID " +
                     "WHERE YEAR(adoptiondetails.adoption_date) = ? AND MONTH(adoptiondetails.adoption_date) = ? " +
-                    "GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date, surrender_type";
+                    "GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date, surrender_type ORDER BY dog.dogID";
         List<DogReportVO> dogList = jdbcTemplate.query(sql, (rs, rowNum) -> {
             DogReportVO dogReportVO = new DogReportVO();
             dogReportVO.setDogID(rs.getInt("dogID"));

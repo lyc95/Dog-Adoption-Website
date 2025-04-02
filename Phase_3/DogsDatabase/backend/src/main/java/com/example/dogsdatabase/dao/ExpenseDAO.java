@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.example.dogsdatabase.entity.po.ExpensePO;
+import com.example.dogsdatabase.entity.vo.ExpenseAnalysisReportItemVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -83,5 +84,15 @@ public class ExpenseDAO {
         // Return affected rows
         return rows;
    }
+
+    public List<ExpenseAnalysisReportItemVO> getExpenseAnalysisReport() 
+    {
+        String sql = "SELECT vendor_name, SUM(amount) AS total_spent FROM Expense GROUP BY vendor_name ORDER BY total_spent DESC";
+        List<ExpenseAnalysisReportItemVO> resultList = jdbcTemplate.query(sql, (rs, rowNum) -> new ExpenseAnalysisReportItemVO(
+            rs.getString("vendor_name"),
+            rs.getBigDecimal("total_spent")
+        ));
+        return resultList;
+    }
 
 }

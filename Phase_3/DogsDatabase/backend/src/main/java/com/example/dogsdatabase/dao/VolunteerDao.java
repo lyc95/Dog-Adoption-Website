@@ -1,11 +1,16 @@
 package com.example.dogsdatabase.dao;
 
-import com.example.dogsdatabase.entity.po.VolunteerPO;
-import lombok.RequiredArgsConstructor;
+import java.time.YearMonth;
+import java.util.List;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.example.dogsdatabase.entity.po.VolunteerPO;
+import com.example.dogsdatabase.entity.vo.BirthdayReportItemVO;
+import com.example.dogsdatabase.entity.vo.VolunteerLookUpItemVO;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @Title: VolunteerDao
@@ -58,5 +63,49 @@ public class VolunteerDao {
             return volunteerPO;
         });
     }
+    
+    public List<BirthdayReportItemVO> getBirthdayReport(YearMonth yearMonth)
+    {
+        String sql = """
+            SELECT 
+            cu.firstname, 
+            cu.lastname, 
+            cu.email, 
+            CASE 
+            WHEN (? - YEAR(cu.birthday)) % 10 = 0 THEN 'Yes' 
+            ELSE 'No' 
+            END AS is_milestone 
+            FROM 
+            CasualUser cu INNER JOIN Volunteer v ON cu.email = v.email 
+            WHERE MONTH(cu.birthday) = ? AND cu.birthday IS NOT NULL;     
+        """;
+        List<BirthdayReportItemVO> resultList = jdbcTemplate.query(sql, (rs, rowNum) -> new BirthdayReportItemVO(
+            rs.getString("firstname"),
+            rs.getString("lastname"),
+            rs.getString("email"),
+            rs.getString("is_milestone").equals("Yes")),
+            yearMonth.getYear(),
+            yearMonth.getMonthValue()
+        );
+        return resultList;
+    }
 
+    public List<VolunteerLookUpItemVO> getVolunteers(String pattern) {
+        String sql = """
+            SELECT firstname, lastname, email, phone_number 
+            FROM CasualUser 
+            NATURAL JOIN volunteer 
+            WHERE LOWER(firstname) LIKE ? OR LOWER(lastname) LIKE ?
+            ORDER BY lastname ASC, firstname ASC; 
+        """;
+        List<VolunteerLookUpItemVO> resultList =  jdbcTemplate.query(sql, (rs, rowNum) -> new VolunteerLookUpItemVO(
+            rs.getString("firstname"),
+            rs.getString("lastname"),
+            rs.getString("email"),
+            rs.getString("phone_number")),
+            "%" + pattern + "%",
+            "%" + pattern + "%"
+        );
+        return resultList;
+    }
 }

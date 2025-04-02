@@ -7,8 +7,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.dogsdatabase.dao.ExpenseDAO;
+import com.example.dogsdatabase.dao.ViewDAO;
+import com.example.dogsdatabase.dao.VolunteerDao;
+import com.example.dogsdatabase.entity.vo.BirthdayReportItemVO;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
+import com.example.dogsdatabase.entity.vo.ExpenseAnalysisReportItemVO;
 import com.example.dogsdatabase.entity.vo.LACDReportVO;
+import com.example.dogsdatabase.entity.vo.MonthlyAdoptionReportItemVO;
+import com.example.dogsdatabase.entity.vo.VolunteerLookUpItemVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 public class ReportService {
 
     private final DogService dogService;
+    private final ViewDAO viewDAO;
+    private final ExpenseDAO expenseDAO;
+    private final VolunteerDao volunteerDao;
     public List<YearMonth> getPastSixMonthWithCurrentMonth(YearMonth yearMonth)
     {
         List<YearMonth> pastSixMonths = new ArrayList<>();
@@ -61,6 +71,28 @@ public class ReportService {
             report.add(reportItemForCurrentMonth);
         }
         return report;
+    }
+    public void createView()
+    {
+        viewDAO.createPast12MonthsView();
+        viewDAO.createDogStatusView();
+    }
+    public List<MonthlyAdoptionReportItemVO> getMonthlyAdoptionReport() 
+    {
+        createView();
+        return viewDAO.getMonthlyAdoptionReport();
+    }
+    public List<ExpenseAnalysisReportItemVO> getExpenseAnalysisReport()
+    {
+        return expenseDAO.getExpenseAnalysisReport();
+    }
+    public List<BirthdayReportItemVO> getVolunteerBirthdayReport(YearMonth yearMonth)
+    {
+        return volunteerDao.getBirthdayReport(yearMonth);
+    }
+    public List<VolunteerLookUpItemVO> getVolunteers(String pattern)
+    {
+        return volunteerDao.getVolunteers(pattern);
     }
     
 }
