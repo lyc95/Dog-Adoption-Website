@@ -66,11 +66,11 @@ CREATE TABLE ApprovedApplication
 ( 
  email varchar(255) NOT NULL, 
  application_date DATE NOT NULL, 
- dogID INT NULL,
+--  dogID INT NULL,
  application_state ENUM('APPROVED', 'MATCHED', 'ADOPTED') NOT NULL DEFAULT 'APPROVED', 
  date_approved DATE NOT NULL, 
  PRIMARY KEY (email, application_date), 
- FOREIGN KEY (dogID) REFERENCES Dog (dogID),
+--  FOREIGN KEY (dogID) REFERENCES Dog (dogID),
  FOREIGN KEY (email, application_date) REFERENCES AdoptionApplication (email, application_date) 
 ); 
  
@@ -91,14 +91,14 @@ CREATE TABLE DogBreed
 
 CREATE TABLE AdoptionDetails 
 ( 
- adoptionDetailsID INT AUTO_INCREMENT PRIMARY KEY, 
+ dogID INT NOT NULL,
  email varchar(255) NOT NULL, 
  application_date DATE NOT NULL, 
  adoption_date DATE NOT NULL, 
  adoption_fee DECIMAL(10, 2) NOT NULL CHECK (adoption_fee >= 0), 
- UNIQUE KEY (email, application_date, adoptionDetailsID), 
- FOREIGN KEY (email, application_date) 
- REFERENCES ApprovedApplication (email, application_date) ON DELETE CASCADE 
+ FOREIGN KEY (dogID) REFERENCES Dog (dogID),
+ PRIMARY KEY (email, application_date, dogID), 
+ FOREIGN KEY (email, application_date) REFERENCES ApprovedApplication (email, application_date) ON DELETE CASCADE 
 ); 
  
 CREATE TABLE Individual 
@@ -158,42 +158,54 @@ CREATE TABLE SystemConfig
     PRIMARY KEY (configName) 
 ); 
 
-CREATE TABLE `User` 
-( 
-    email varchar(255) NOT NULL, 
+-- CREATE TABLE `User` 
+-- ( 
+--     email varchar(255) NOT NULL, 
+--     `password` varchar(255) NOT NULL, 
+--     PRIMARY KEY (email) 
+-- );
+
+-- CREATE TABLE AdminUser 
+-- (
+--     email varchar(255) NOT NULL, 
+--     PRIMARY KEY (email), 
+--     FOREIGN KEY (email) REFERENCES User(email)
+-- ); 
+
+-- CREATE TABLE CasualUser 
+-- (
+--     email varchar(255) NOT NULL, 
+--     birthday date NULL, 
+--     phone_number varchar(255) NOT NULL, 
+--     firstname varchar(255) NOT NULL, 
+--     lastname varchar(255) NOT NULL, 
+--     PRIMARY KEY (email), 
+--     FOREIGN KEY (email) REFERENCES User(email) 
+-- ); 
+
+-- CREATE TABLE Volunteer 
+-- ( 
+--     email varchar(255) NOT NULL, 
+--     -- age INT NOT NULL CHECK (age >= 0), 
+--     PRIMARY KEY (email), 
+--     FOREIGN KEY (email) REFERENCES CasualUser(email) 
+-- ); 
+
+-- CREATE TABLE ExecutiveDirector 
+-- ( 
+--     email varchar(255) NOT NULL, 
+--     PRIMARY KEY (email), 
+--     FOREIGN KEY (email) REFERENCES CasualUser(email) 
+-- ); 
+
+ CREATE TABLE `User`
+(
+    email varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL, 
-    PRIMARY KEY (email) 
-);
-
-CREATE TABLE AdminUser 
-(
-    email varchar(255) NOT NULL, 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES User(email)
-); 
-
-CREATE TABLE CasualUser 
-(
-    email varchar(255) NOT NULL, 
-    birthday date NULL, 
+    birthday date NOT NULL, 
     phone_number varchar(255) NOT NULL, 
     firstname varchar(255) NOT NULL, 
     lastname varchar(255) NOT NULL, 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES User(email) 
-); 
-
-CREATE TABLE Volunteer 
-( 
-    email varchar(255) NOT NULL, 
-    age INT NOT NULL CHECK (age >= 0), 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES CasualUser(email) 
-); 
-
-CREATE TABLE ExecutiveDirector 
-( 
-    email varchar(255) NOT NULL, 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES CasualUser(email) 
+    user_type ENUM('VOLUNTEER', 'EXECUTIVEDIRECTOR', 'ADMIN') NOT NULL, 
+    PRIMARY KEY (email),
 ); 
