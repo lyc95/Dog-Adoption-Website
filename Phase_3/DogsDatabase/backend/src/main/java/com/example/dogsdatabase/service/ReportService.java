@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.dogsdatabase.dao.ExpenseDAO;
+import com.example.dogsdatabase.dao.UserDao;
 import com.example.dogsdatabase.dao.ViewDAO;
-import com.example.dogsdatabase.dao.VolunteerDao;
 import com.example.dogsdatabase.entity.vo.BirthdayReportItemVO;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
 import com.example.dogsdatabase.entity.vo.ExpenseAnalysisReportItemVO;
@@ -26,7 +26,7 @@ public class ReportService {
     private final DogService dogService;
     private final ViewDAO viewDAO;
     private final ExpenseDAO expenseDAO;
-    private final VolunteerDao volunteerDao;
+    private final UserDao userDao;
     public List<YearMonth> getPastSixMonthWithCurrentMonth(YearMonth yearMonth)
     {
         List<YearMonth> pastSixMonths = new ArrayList<>();
@@ -72,27 +72,23 @@ public class ReportService {
         }
         return report;
     }
-    public void createView()
-    {
-        viewDAO.createPast12MonthsView();
-        viewDAO.createDogStatusView();
-    }
+    
     public List<MonthlyAdoptionReportItemVO> getMonthlyAdoptionReport() 
     {
-        createView();
         return viewDAO.getMonthlyAdoptionReport();
     }
+
     public List<ExpenseAnalysisReportItemVO> getExpenseAnalysisReport()
     {
         return expenseDAO.getExpenseAnalysisReport();
     }
     public List<BirthdayReportItemVO> getVolunteerBirthdayReport(YearMonth yearMonth)
     {
-        return volunteerDao.getBirthdayReport(yearMonth);
+        return userDao.getBirthdayReport(yearMonth);
     }
     public List<VolunteerLookUpItemVO> getVolunteers(String pattern)
     {
-        return volunteerDao.getVolunteers(pattern);
+        return userDao.getVolunteers(pattern);
     }
     
 }

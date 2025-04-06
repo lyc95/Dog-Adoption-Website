@@ -8,5 +8,5 @@ public class BirthdayReportItemVO {
     private String firstname;
     private String lastname;
     private String email;
-    private Boolean isMilestone;
+    private String isMilestone;
 }

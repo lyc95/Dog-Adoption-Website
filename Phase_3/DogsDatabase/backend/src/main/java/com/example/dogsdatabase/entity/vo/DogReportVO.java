@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.example.dogsdatabase.entity.po.Sex;
-import com.example.dogsdatabase.entity.po.SurrenderType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +22,7 @@ public class DogReportVO {
     private LocalDate surrenderDate;
     private LocalDate adoptedDate;
     private Integer daysInRescue;
-    private SurrenderType surrenderType;
+    private String animalControlSurrenderIndicator;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "0.00")
     private BigDecimal totalExpenses;
 }

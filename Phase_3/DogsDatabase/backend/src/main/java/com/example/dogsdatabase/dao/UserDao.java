@@ -1,9 +1,14 @@
 package com.example.dogsdatabase.dao;
 
+import java.time.YearMonth;
+import java.util.List;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.example.dogsdatabase.entity.po.UserPO;
+import com.example.dogsdatabase.entity.vo.BirthdayReportItemVO;
+import com.example.dogsdatabase.entity.vo.VolunteerLookUpItemVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +57,50 @@ public class UserDao {
                 "UNION ALL SELECT 'ExecutiveDirector' FROM ExecutiveDirector WHERE email = ? " +
                 "LIMIT 1";
         return jdbcTemplate.queryForObject(sql,  new Object[]{email, email, email}, String.class);
+    }
+
+    public List<BirthdayReportItemVO> getBirthdayReport(YearMonth yearMonth)
+    {
+        String sql = """
+        SELECT 
+        firstname, 
+        lastname, 
+        email, 
+        CASE 
+        WHEN (? - YEAR(birthday)) % 10 = 0 THEN 'Yes' 
+        ELSE 'No' 
+        END AS is_milestone 
+        FROM 
+        `User`
+        WHERE user_type = 'VOLUNTEER' AND MONTH(birthday) = ? AND birthday IS NOT NULL;  
+        """;
+        List<BirthdayReportItemVO> resultList = jdbcTemplate.query(sql, (rs, rowNum) -> new BirthdayReportItemVO(
+            rs.getString("firstname"),
+            rs.getString("lastname"),
+            rs.getString("email"),
+            rs.getString("is_milestone")),
+            yearMonth.getYear(),
+            yearMonth.getMonthValue()
+        );
+        return resultList;
+    }
+
+    public List<VolunteerLookUpItemVO> getVolunteers(String pattern) {
+        String sql = """
+        SELECT firstname, lastname, email, phone_number 
+        FROM `User`
+        WHERE user_type = 'VOLUNTEER' AND LOWER(firstname) LIKE ? OR LOWER(lastname) LIKE ?
+        ORDER BY lastname ASC, firstname ASC; 
+        """;
+        List<VolunteerLookUpItemVO> resultList =  jdbcTemplate.query(sql, (rs, rowNum) -> new VolunteerLookUpItemVO(
+            rs.getString("firstname"),
+            rs.getString("lastname"),
+            rs.getString("email"),
+            rs.getString("phone_number")),
+            "%" + pattern + "%",
+            "%" + pattern + "%"
+        );
+        return resultList;
     }
 
 }

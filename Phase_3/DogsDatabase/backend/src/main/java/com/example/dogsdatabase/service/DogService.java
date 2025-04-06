@@ -1,6 +1,5 @@
 package com.example.dogsdatabase.service;
 
-import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,13 +92,7 @@ public class DogService {
     }
     public List<DogReportVO> getAllDogsAdoptedWithExpensesInMonth(YearMonth yearMonth)
     {
-        List<DogReportVO> dogList = dogDao.getAllDogsAdoptedWithoutExpensesInMonth(yearMonth);
-        /* Calculate total expenses for each dog*/
-        for (DogReportVO dog : dogList)
-        {
-            BigDecimal totalAmount = expenseDAO.getTotalExpensesByDogId(dog.getDogID());
-            dog.setTotalExpenses(totalAmount);
-        }
+        List<DogReportVO> dogList = dogDao.getAllDogsAdoptedWithExpensesInMonth(yearMonth);
         return dogList;
     }
 }

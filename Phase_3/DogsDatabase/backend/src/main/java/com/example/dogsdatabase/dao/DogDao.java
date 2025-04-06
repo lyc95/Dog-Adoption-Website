@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.example.dogsdatabase.entity.po.DogPO;
 import com.example.dogsdatabase.entity.po.Sex;
-import com.example.dogsdatabase.entity.po.SurrenderType;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
 
@@ -173,12 +172,14 @@ public class DogDao {
     
     public List<DogReportVO> getAllDogsSurrenderedByLACDInMonth(YearMonth yearMonth)
     {
-        String sql = "SELECT dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds " +
-                    "FROM dog NATURAL JOIN localanimalcontroldepartment " + 
-                    "LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID " + 
-                    "LEFT JOIN microchip ON dog.dogID = microchip.dogID " + 
-                    "WHERE YEAR(dog.surrender_date) = ? AND MONTH(dog.surrender_date) = ? " +
-                    "GROUP BY dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date ORDER BY dog.dogID";
+        String sql = """
+        SELECT dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds
+        FROM dog JOIN localanimalcontroldepartment ON dog.surrenderId = localanimalcontroldepartment.surrenderId
+        LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID 
+        LEFT JOIN microchip ON dog.dogID = microchip.dogID 
+        WHERE YEAR(dog.surrender_date) = ? AND MONTH(dog.surrender_date) = ? 
+        GROUP BY dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date ORDER BY dog.dogID        
+        """;
         List<DogReportVO> dogList = jdbcTemplate.query(sql, (rs, rowNum) -> {
             DogReportVO dogReportVO = new DogReportVO();
             dogReportVO.setDogID(rs.getInt("dogID"));
@@ -194,18 +195,19 @@ public class DogDao {
 
     public List<DogReportVO> getAllDogsdogsAdoptedAfter60DaysInMonth(YearMonth yearMonth)
     {
-        String sql = "SELECT dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date, " +
-                    "DATEDIFF(adoptiondetails.adoption_date, dog.surrender_date) + 1 AS days_in_rescue, " +
-                    "GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds " +
-                    "FROM dog " +
-                    "NATURAL JOIN approvedapplication " +
-                    "NATURAL JOIN adoptiondetails " + 
-                    "LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID " +
-                    "LEFT JOIN microchip ON dog.dogID = microchip.dogID " + 
-                    "WHERE YEAR(adoptiondetails.adoption_date) = ? AND MONTH(adoptiondetails.adoption_date) = ? " + 
-                    "AND DATEDIFF(adoptiondetails.adoption_date, dog.surrender_date) + 1 >= 60 " + 
-                    "GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date " +
-                    "ORDER BY days_in_rescue DESC";
+        String sql = """
+        SELECT dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date,
+        DATEDIFF(adoptiondetails.adoption_date, dog.surrender_date) + 1 AS days_in_rescue,
+        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds
+        FROM dog
+        JOIN adoptiondetails ON dog.dogID = adoptiondetails.dogID
+        LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID
+        LEFT JOIN microchip ON dog.dogID = microchip.dogID
+        WHERE YEAR(adoptiondetails.adoption_date) = ? AND MONTH(adoptiondetails.adoption_date) = ?
+        AND DATEDIFF(adoptiondetails.adoption_date, dog.surrender_date) + 1 >= 60
+        GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date
+        ORDER BY days_in_rescue DESC;        
+        """;
         List<DogReportVO> dogList = jdbcTemplate.query(sql, (rs, rowNum) -> {
             DogReportVO dogReportVO = new DogReportVO();
             dogReportVO.setDogID(rs.getInt("dogID"));
@@ -220,24 +222,28 @@ public class DogDao {
         return dogList;
     }
 
-    public List<DogReportVO> getAllDogsAdoptedWithoutExpensesInMonth(YearMonth yearMonth)
+    public List<DogReportVO> getAllDogsAdoptedWithExpensesInMonth(YearMonth yearMonth)
     {
-        String sql = "SELECT dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date, " +
-                    "GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds, " +
-                    "CASE " +
-                    "WHEN individual.surrenderID IS NOT NULL THEN 'INDIVIDUAL' " +
-                    "WHEN localanimalcontroldepartment.surrenderID IS NOT NULL THEN 'LOCALANIMALCONTROLDEPARTMENT' " +
-                    "ELSE 'UNKNOWN' " + 
-                    "END AS surrender_type " +
-                    "FROM dog " + 
-                    "NATURAL JOIN approvedapplication " + 
-                    "NATURAL JOIN adoptiondetails " + 
-                    "LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID " +
-                    "LEFT JOIN microchip ON dog.dogID = microchip.dogID " +
-                    "LEFT JOIN individual ON dog.surrenderID = individual.surrenderID " +
-                    "LEFT JOIN localanimalcontroldepartment ON dog.surrenderID = localanimalcontroldepartment.surrenderID " +
-                    "WHERE YEAR(adoptiondetails.adoption_date) = ? AND MONTH(adoptiondetails.adoption_date) = ? " +
-                    "GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date, surrender_type ORDER BY dog.dogID";
+        String sql = """
+        SELECT dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date,  
+        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds, total_expenses,
+        CASE  
+        WHEN localanimalcontroldepartment.surrenderID IS NOT NULL THEN 'Yes'  
+        ELSE 'No'   
+        END AS Animal_control_surrender_indicator  
+        FROM dog   
+        JOIN adoptiondetails ON dog.dogID = adoptiondetails.dogID
+        LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID  
+        LEFT JOIN microchip ON dog.dogID = microchip.dogID 
+        LEFT JOIN localanimalcontroldepartment ON dog.surrenderID = localanimalcontroldepartment.surrenderID
+        LEFT JOIN (
+            SELECT dogID, SUM(amount) AS total_expenses
+            FROM expense
+            GROUP BY dogID
+        ) AS expenses ON dog.dogID = expenses.dogID
+        WHERE YEAR(adoptiondetails.adoption_date) = ? AND MONTH(adoptiondetails.adoption_date) = ?
+        GROUP BY dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date, Animal_control_surrender_indicator ORDER BY dog.dogID;
+        """;
         List<DogReportVO> dogList = jdbcTemplate.query(sql, (rs, rowNum) -> {
             DogReportVO dogReportVO = new DogReportVO();
             dogReportVO.setDogID(rs.getInt("dogID"));
@@ -246,7 +252,8 @@ public class DogDao {
             dogReportVO.setMicrochipID(rs.getString("microchipID"));
             dogReportVO.setSurrenderDate(rs.getDate("surrender_date").toLocalDate());
             dogReportVO.setAdoptedDate(rs.getDate("adoption_date").toLocalDate());
-            dogReportVO.setSurrenderType(SurrenderType.valueOf(rs.getString("surrender_type")));
+            dogReportVO.setAnimalControlSurrenderIndicator(rs.getString("Animal_control_surrender_indicator"));
+            dogReportVO.setTotalExpenses(rs.getBigDecimal("total_expenses"));
             return dogReportVO;
         }, yearMonth.getYear(), yearMonth.getMonthValue());
         return dogList;
