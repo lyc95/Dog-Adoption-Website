@@ -66,11 +66,9 @@ CREATE TABLE ApprovedApplication
 ( 
  email varchar(255) NOT NULL, 
  application_date DATE NOT NULL, 
- dogID INT NULL,
  application_state ENUM('APPROVED', 'MATCHED', 'ADOPTED') NOT NULL DEFAULT 'APPROVED', 
  date_approved DATE NOT NULL, 
  PRIMARY KEY (email, application_date), 
- FOREIGN KEY (dogID) REFERENCES Dog (dogID),
  FOREIGN KEY (email, application_date) REFERENCES AdoptionApplication (email, application_date) 
 ); 
  
@@ -91,14 +89,14 @@ CREATE TABLE DogBreed
 
 CREATE TABLE AdoptionDetails 
 ( 
- adoptionDetailsID INT AUTO_INCREMENT PRIMARY KEY, 
+ dogID INT NOT NULL,
  email varchar(255) NOT NULL, 
  application_date DATE NOT NULL, 
  adoption_date DATE NOT NULL, 
  adoption_fee DECIMAL(10, 2) NOT NULL CHECK (adoption_fee >= 0), 
- UNIQUE KEY (email, application_date, adoptionDetailsID), 
- FOREIGN KEY (email, application_date) 
- REFERENCES ApprovedApplication (email, application_date) ON DELETE CASCADE 
+ FOREIGN KEY (dogID) REFERENCES Dog (dogID),
+ PRIMARY KEY (email, application_date, dogID), 
+ FOREIGN KEY (email, application_date) REFERENCES ApprovedApplication (email, application_date) ON DELETE CASCADE 
 ); 
  
 CREATE TABLE Individual 
@@ -158,46 +156,17 @@ CREATE TABLE SystemConfig
     PRIMARY KEY (configName) 
 ); 
 
-CREATE TABLE `User` 
-( 
-    email varchar(255) NOT NULL, 
+ CREATE TABLE `User`
+(
+    email varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL, 
-    PRIMARY KEY (email) 
-);
-
-CREATE TABLE AdminUser 
-(
-    email varchar(255) NOT NULL, 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES User(email)
-); 
-
-CREATE TABLE CasualUser 
-(
-    email varchar(255) NOT NULL, 
-    birthday date NULL, 
+    birthday date NOT NULL, 
     phone_number varchar(255) NOT NULL, 
     firstname varchar(255) NOT NULL, 
     lastname varchar(255) NOT NULL, 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES User(email) 
+    user_type ENUM('VOLUNTEER', 'EXECUTIVEDIRECTOR', 'ADMIN') NOT NULL, 
+    PRIMARY KEY (email)
 ); 
-
-CREATE TABLE Volunteer 
-( 
-    email varchar(255) NOT NULL, 
-    age INT NOT NULL CHECK (age >= 0), 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES CasualUser(email) 
-); 
-
-CREATE TABLE ExecutiveDirector 
-( 
-    email varchar(255) NOT NULL, 
-    PRIMARY KEY (email), 
-    FOREIGN KEY (email) REFERENCES CasualUser(email) 
-); 
-
 
 INSERT INTO `cs6400_sp25_team075`.`adopter` (`email`, `phone_number`, `household_size`, `firstname`, `lastname`, `street`, `city`, `state`, `zipcode`) VALUES ('adopter1@example.com', '321321', 21, 'aaa', 'bbb', 'mn', 'bnb', 'bnb', '3211446546');
 INSERT INTO `cs6400_sp25_team075`.`adopter` (`email`, `phone_number`, `household_size`, `firstname`, `lastname`, `street`, `city`, `state`, `zipcode`) VALUES ('adopter2@example.com', '321123', 12, 'bbb', 'aaa', 'mmm', 'kjh', 'zcsd', '98787-95154');
@@ -253,7 +222,7 @@ INSERT INTO `cs6400_sp25_team075`.`approvedapplication` (`email`, `application_d
 INSERT INTO `cs6400_sp25_team075`.`approvedapplication` (`email`, `application_date`, `application_state`, `date_approved`) VALUES ('adopter7@example.com', '2024-11-26', 'ADOPTED', '2024-11-28');
 INSERT INTO `cs6400_sp25_team075`.`approvedapplication` (`email`, `application_date`, `application_state`, `date_approved`) VALUES ('adopter3@example.com', '2025-03-08', 'ADOPTED', '2025-03-09');
 INSERT INTO `cs6400_sp25_team075`.`adoptiondetails` (`dogID`, `email`, `application_date`, `adoption_date`, `adoption_fee`) VALUES (5, 'adopter2@example.com', '2025-03-12', '2025-03-14', 284.26);
-INSERT INTO `cs6400_sp25_team075`.`adoptiondetails` (`dogID`, `email`, `application_date`, `adoption_date`, `adoption_fee`) VALUES (2, 'adopter3@example.com', '2025-03-07', '2025-03-09', 196.09);
+INSERT INTO `cs6400_sp25_team075`.`adoptiondetails` (`dogID`, `email`, `application_date`, `adoption_date`, `adoption_fee`) VALUES (6, 'adopter3@example.com', '2025-03-07', '2025-03-09', 196.09);
 INSERT INTO `cs6400_sp25_team075`.`adoptiondetails` (`dogID`, `email`, `application_date`, `adoption_date`, `adoption_fee`) VALUES (3, 'adopter4@example.com', '2025-02-15', '2025-02-18', 231.09);
 INSERT INTO `cs6400_sp25_team075`.`adoptiondetails` (`dogID`, `email`, `application_date`, `adoption_date`, `adoption_fee`) VALUES (4, 'adopter5@example.com', '2025-01-12', '2025-01-18', 214.36);
 INSERT INTO `cs6400_sp25_team075`.`adoptiondetails` (`dogID`, `email`, `application_date`, `adoption_date`, `adoption_fee`) VALUES (9, 'adopter6@example.com', '2024-12-13', '2024-12-16', 258.36);

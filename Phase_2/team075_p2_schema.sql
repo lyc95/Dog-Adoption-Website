@@ -207,5 +207,5 @@ CREATE TABLE SystemConfig
     firstname varchar(255) NOT NULL, 
     lastname varchar(255) NOT NULL, 
     user_type ENUM('VOLUNTEER', 'EXECUTIVEDIRECTOR', 'ADMIN') NOT NULL, 
-    PRIMARY KEY (email),
+    PRIMARY KEY (email)
 ); 
