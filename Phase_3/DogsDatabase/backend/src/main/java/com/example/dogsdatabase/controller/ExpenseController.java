@@ -1,5 +1,6 @@
 package com.example.dogsdatabase.controller;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.dogsdatabase.common.Result;
+import com.example.dogsdatabase.entity.po.ExpenseCategoryPO;
 import com.example.dogsdatabase.entity.po.ExpensePO;
 import com.example.dogsdatabase.service.ExpenseService;
 
@@ -90,4 +92,18 @@ public class ExpenseController {
             return Result.success();
         }
     }
+
+    @GetMapping({"/categoty/{pattern}", "/categoty"})
+    public Result getExpenseCategory(@PathVariable(required = false) Optional<String> pattern)
+    {
+        try
+        {
+            String searchPattern = pattern.orElse("");
+            List<ExpenseCategoryPO> list = expenseService.getExpenseCategories(searchPattern);
+            return Result.success(list);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
+
 }

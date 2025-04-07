@@ -1,5 +1,6 @@
 package com.example.dogsdatabase.service;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +12,10 @@ import org.springframework.stereotype.Service;
 import com.example.dogsdatabase.dao.DogDao;
 import com.example.dogsdatabase.dao.ExpenseDAO;
 import com.example.dogsdatabase.entity.po.DogPO;
-import com.example.dogsdatabase.entity.po.ExpensePO;
 import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
+import com.example.dogsdatabase.entity.vo.ExpensePerCategoryVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -104,8 +105,10 @@ public class DogService {
             throw new Exception("Error: Invalid Dog ID");
         }
         DogDetailsVO dogDetailsVO = dogDao.getDogDetailsByDogID(dogID);
-        List<ExpensePO> expensesForDog = expenseDAO.getAllExpensesByDogId(dogID);
+        List<ExpensePerCategoryVO> expensesForDog = expenseDAO.getExpensesPerCategoryDogId(dogID);
+        BigDecimal grandTotal = expensesForDog.stream().map(ExpensePerCategoryVO::getTotalExpense).reduce(BigDecimal.ZERO, BigDecimal::add);
         dogDetailsVO.setDogExpensesList(expensesForDog);
+        dogDetailsVO.setGrandTotal(grandTotal);
         return dogDetailsVO;
     }
 }

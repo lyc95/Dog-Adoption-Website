@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.dogsdatabase.dao.ExpenseDAO;
+import com.example.dogsdatabase.entity.po.ExpenseCategoryPO;
 import com.example.dogsdatabase.entity.po.ExpensePO;
 
 import lombok.RequiredArgsConstructor;
@@ -61,5 +62,9 @@ public class ExpenseService {
     {
         checkAmount(expense.getAmount());
         return expenseDAO.updateExpense(expense);
+    }
+    public List<ExpenseCategoryPO> getExpenseCategories(String pattern)
+    {
+        return expenseDAO.getExpenseCategories(pattern);
     }
 }

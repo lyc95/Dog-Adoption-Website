@@ -262,29 +262,26 @@ public class DogDao {
     public DogDetailsVO getDogDetailsByDogID(Integer dogID)
     {
         String sql = """
-        SELECT 
-        dog.dogID,
-        dog.name,
-        dog.sex, 
-        dog.adoption_state,
-        dog.alteration_status,
-        dog.age_when_surrender + TIMESTAMPDIFF(MONTH, surrender_date, NOW()) AS current_age_in_months,
-        dog.description,
-        microchip.microchipID, 
-        dog.surrender_date,
-        adoptiondetails.adoption_date,
-        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds, 
+        SELECT dog.dogID, dog.name, dog.sex, dog.adoption_state,
+        dog.alteration_status, dog.age_when_surrender + TIMESTAMPDIFF(MONTH, surrender_date, NOW()) AS current_age_in_months,
+        dog.description, microchip.microchipID, dog.surrender_date,
         CASE  
-        WHEN localanimalcontroldepartment.surrenderID IS NOT NULL THEN 'Yes'  
-        ELSE 'No'   
+            WHEN localanimalcontroldepartment.phonenumber IS NOT NULL THEN localanimalcontroldepartment.phonenumber 
+            ELSE individual.phonenumber 
+        END AS surrender_phonenumber,
+        adoptiondetails.adoption_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds, 
+        CASE  
+            WHEN localanimalcontroldepartment.surrenderID IS NOT NULL THEN 'Yes'  
+            ELSE 'No'   
         END AS Animal_control_surrender_indicator 
         from dog 
         LEFT JOIN microchip ON dog.dogID = microchip.dogID
         LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID
         LEFT JOIN localanimalcontroldepartment ON dog.surrenderID = localanimalcontroldepartment.surrenderID
+        LEFT JOIN individual ON dog.surrenderID = individual.surrenderID
         LEFT JOIN adoptiondetails ON dog.dogID = adoptiondetails.dogID
         WHERE dog.dogID = ?
-        GROUP BY dog.dogID, dog.name, dog.sex, dog.adoption_state, dog.alteration_status, current_age_in_months, dog.description, microchipID, dog.surrender_date, adoptiondetails.adoption_date, Animal_control_surrender_indicator      
+        GROUP BY dog.dogID, dog.name, dog.sex, dog.adoption_state, dog.alteration_status, current_age_in_months, dog.description, microchipID, dog.surrender_date, surrender_phonenumber, adoptiondetails.adoption_date, Animal_control_surrender_indicator   
         """;
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
             DogDetailsVO dog = new DogDetailsVO();
@@ -297,6 +294,7 @@ public class DogDao {
             {
                 dog.setAdoptionDate(rs.getDate("adoption_date").toLocalDate());
             }
+            dog.setSurrenderPhonenumber(rs.getString("surrender_phonenumber"));
             dog.setCurrentAgeInMonth(rs.getInt("current_age_in_months"));
             dog.setAlterationStatus(rs.getBoolean("alteration_status"));
             dog.setDescription(rs.getString("description"));

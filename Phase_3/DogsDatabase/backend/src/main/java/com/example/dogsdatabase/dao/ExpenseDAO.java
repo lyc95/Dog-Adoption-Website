@@ -6,8 +6,10 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.example.dogsdatabase.entity.po.ExpenseCategoryPO;
 import com.example.dogsdatabase.entity.po.ExpensePO;
 import com.example.dogsdatabase.entity.vo.ExpenseAnalysisReportItemVO;
+import com.example.dogsdatabase.entity.vo.ExpensePerCategoryVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +30,21 @@ public class ExpenseDAO {
             rs.getDate("expense_date").toLocalDate(),
             rs.getBigDecimal("amount")
         ));
+    }
+
+    public List<ExpensePerCategoryVO> getExpensesPerCategoryDogId(Integer dogId)
+    {
+        String sql = """
+        SELECT 
+        category, SUM(amount) as total_expenses
+        FROM expense
+        WHERE dogID = ?
+        GROUP BY category;
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new ExpensePerCategoryVO(
+            rs.getString("category"),
+            rs.getBigDecimal("total_expenses")
+        ), dogId);
     }
 
     public BigDecimal getTotalExpensesByDogId(Integer dogId)
@@ -93,6 +110,18 @@ public class ExpenseDAO {
             rs.getBigDecimal("total_spent")
         ));
         return resultList;
+    }
+
+    public List<ExpenseCategoryPO> getExpenseCategories(String pattern)
+    {
+        String sql = """
+        SELECT category FROM expensecategory WHERE LOWER(category) LIKE LOWER(?);
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new ExpenseCategoryPO(
+            rs.getString("category")
+        ),
+        "%" + pattern + "%"
+        );
     }
 
 }
