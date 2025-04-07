@@ -79,13 +79,14 @@ const handleLogin = async () => {
     })
 
     if (res.code  === '200') {
-      ElMessage.success('login success')
-      await router.push('/dashboard')
+      ElMessage.success('login  success');
+      sessionStorage.setItem('user', JSON.stringify(res.data))
+      await router.push({path: '/dashboard'})
     } else {
       ElMessage.error(res.msg)
     }
   } catch (error) {
-    ElMessage.error('Interface call exception')
+    ElMessage.error(error.msg)
   } finally {
     loading.value  = false
   }

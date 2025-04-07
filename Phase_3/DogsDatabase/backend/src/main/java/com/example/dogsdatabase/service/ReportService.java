@@ -72,7 +72,7 @@ public class ReportService {
         }
         return report;
     }
-    
+
     public List<MonthlyAdoptionReportItemVO> getMonthlyAdoptionReport() 
     {
         return viewDAO.getMonthlyAdoptionReport();

@@ -26,8 +26,8 @@ public class AdopterDao {
         String sql = "INSERT INTO adopter (email, phone_number, household_size, firstname, lastname, street, city, state, zipcode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 adopter.getEmail(),
-                adopter.getPhoneNumber(),
-                adopter.getHouseholdSize(),
+                adopter.getPhone_number(),
+                adopter.getHousehold_size(),
                 adopter.getFirstname(),
                 adopter.getLastname(),
                 adopter.getStreet(),
@@ -44,8 +44,8 @@ public class AdopterDao {
     public int updateAdopter(AdopterPO adopter) {
         String sql = "UPDATE adopter SET phone_number = ?, household_size = ?, firstname = ?, lastname = ?, street = ?, city = ?, state = ?, zipcode = ? WHERE email = ?";
         return jdbcTemplate.update(sql,
-                adopter.getPhoneNumber(),
-                adopter.getHouseholdSize(),
+                adopter.getPhone_number(),
+                adopter.getHousehold_size(),
                 adopter.getFirstname(),
                 adopter.getLastname(),
                 adopter.getStreet(),
@@ -75,8 +75,8 @@ public class AdopterDao {
         return jdbcTemplate.queryForObject(sql, new Object[]{email}, (rs, rowNum) -> {
             AdopterPO adopter = new AdopterPO();
             adopter.setEmail(rs.getString("email"));
-            adopter.setPhoneNumber(rs.getString("phone_number"));
-            adopter.setHouseholdSize(rs.getInt("household_size"));
+            adopter.setPhone_number(rs.getString("phone_number"));
+            adopter.setHousehold_size(rs.getInt("household_size"));
             adopter.setFirstname(rs.getString("firstname"));
             adopter.setLastname(rs.getString("lastname"));
             adopter.setStreet(rs.getString("street"));
@@ -96,8 +96,8 @@ public class AdopterDao {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             AdopterPO adopter = new AdopterPO();
             adopter.setEmail(rs.getString("email"));
-            adopter.setPhoneNumber(rs.getString("phone_number"));
-            adopter.setHouseholdSize(rs.getInt("household_size"));
+            adopter.setPhone_number(rs.getString("phone_number"));
+            adopter.setHousehold_size(rs.getInt("household_size"));
             adopter.setFirstname(rs.getString("firstname"));
             adopter.setLastname(rs.getString("lastname"));
             adopter.setStreet(rs.getString("street"));

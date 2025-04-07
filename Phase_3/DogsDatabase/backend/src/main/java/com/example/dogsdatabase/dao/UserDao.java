@@ -3,6 +3,7 @@ package com.example.dogsdatabase.dao;
 import java.time.YearMonth;
 import java.util.List;
 
+import com.example.dogsdatabase.entity.po.UserType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -40,23 +41,20 @@ public class UserDao {
     }
 
     public UserPO getUserByEmail(String email){
-        String sql = "SELECT email, password FROM user WHERE email = ?";
-        try {
-            return jdbcTemplate.queryForObject(sql,  new Object[]{email}, (rs, rowNum) ->
-                    new UserPO(rs.getString("email"), rs.getString("password"))
-            );
-        } catch (Exception e) {
-            return null;
-        }
+        String sql = "SELECT * FROM user WHERE email = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            UserPO userPO = new UserPO();
+            userPO.setEmail(rs.getString("email"));
+            userPO.setPassword(rs.getString("password"));
+            userPO.setBirthday(rs.getDate("birthday").toLocalDate());
+            userPO.setPhone_number(rs.getString("phone_number"));
+            userPO.setFirstname(rs.getString("firstname"));
+            userPO.setLastname(rs.getString("lastname"));
+            userPO.setUser_type(UserType.valueOf(rs.getString("user_type")));
+            return userPO;
+        }, email);
 
-    }
 
-    public String getUserType(String email) {
-        String sql = "SELECT 'AdminUser' AS type FROM AdminUser WHERE email = ? " +
-                "UNION ALL SELECT 'Volunteer' FROM Volunteer WHERE email = ? " +
-                "UNION ALL SELECT 'ExecutiveDirector' FROM ExecutiveDirector WHERE email = ? " +
-                "LIMIT 1";
-        return jdbcTemplate.queryForObject(sql,  new Object[]{email, email, email}, String.class);
     }
 
     public List<BirthdayReportItemVO> getBirthdayReport(YearMonth yearMonth)
@@ -102,5 +100,7 @@ public class UserDao {
         );
         return resultList;
     }
+
+
 
 }

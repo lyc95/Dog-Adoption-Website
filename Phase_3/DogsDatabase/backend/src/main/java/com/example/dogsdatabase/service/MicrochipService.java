@@ -72,4 +72,8 @@ public class MicrochipService {
         }
         return microchipDAO.getMicrochipVendors(pattern);
     }
+
+    public List<MicrochipPO> getMicrochipByDogID(Integer dogID) {
+        return microchipDAO.getMicrochipForDog(dogID);
+    }
 }

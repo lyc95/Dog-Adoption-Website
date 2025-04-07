@@ -155,7 +155,7 @@ public class DogDao {
 
 
     public List<DogPO> getAllDogs() {
-        String sql = "SELECT * FROM dog";
+        String sql = "SELECT * FROM dog ORDER BY surrender_date ASC";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             DogPO dogPO = new DogPO();
             dogPO.setDogID(rs.getInt("dogID"));

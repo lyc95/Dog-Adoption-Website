@@ -4,14 +4,14 @@ import router from './router'
 import './assets/css/global.css'
 import 'element-plus/dist/index.css'
 import ElementPlus from 'element-plus'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import English from 'element-plus/es/locale/lang/en'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const app = createApp(App)
 
 app.use(router)
 app.use(ElementPlus, {
-    locale: zhCn
+    locale: English
 })
 app.mount('#app')
 
