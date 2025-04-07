@@ -1,13 +1,22 @@
 package com.example.dogsdatabase.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.dogsdatabase.common.Result;
+import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
 import com.example.dogsdatabase.service.DogService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @Title: DogController
@@ -52,6 +61,16 @@ public class DogController {
     @DeleteMapping("/{id}")
     public int deleteDog(@PathVariable Integer id){
         return dogService.deleteDog(id);
+    }
+
+    @GetMapping("/details/{dogID}")
+    public Result getDogDetailsByDogID(@PathVariable("dogID") Integer dogID) {
+        try {
+            DogDetailsVO dogDetailsVO = dogService.getDogDetailsByDogID(dogID);
+            return Result.success(dogDetailsVO);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
     }
 
 

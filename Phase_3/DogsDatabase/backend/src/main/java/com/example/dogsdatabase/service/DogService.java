@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.example.dogsdatabase.dao.DogDao;
 import com.example.dogsdatabase.dao.ExpenseDAO;
 import com.example.dogsdatabase.entity.po.DogPO;
+import com.example.dogsdatabase.entity.po.ExpensePO;
+import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
 
@@ -94,5 +96,16 @@ public class DogService {
     {
         List<DogReportVO> dogList = dogDao.getAllDogsAdoptedWithExpensesInMonth(yearMonth);
         return dogList;
+    }
+    public DogDetailsVO getDogDetailsByDogID(Integer dogID) throws Exception
+    {
+        if (dogID == null || dogID < 0)
+        {
+            throw new Exception("Error: Invalid Dog ID");
+        }
+        DogDetailsVO dogDetailsVO = dogDao.getDogDetailsByDogID(dogID);
+        List<ExpensePO> expensesForDog = expenseDAO.getAllExpensesByDogId(dogID);
+        dogDetailsVO.setDogExpensesList(expensesForDog);
+        return dogDetailsVO;
     }
 }

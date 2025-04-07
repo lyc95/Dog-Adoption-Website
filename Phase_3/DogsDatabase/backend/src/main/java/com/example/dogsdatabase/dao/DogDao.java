@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.dogsdatabase.entity.po.DogPO;
 import com.example.dogsdatabase.entity.po.Sex;
+import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
 
@@ -257,5 +258,52 @@ public class DogDao {
             return dogReportVO;
         }, yearMonth.getYear(), yearMonth.getMonthValue());
         return dogList;
+    }
+    public DogDetailsVO getDogDetailsByDogID(Integer dogID)
+    {
+        String sql = """
+        SELECT 
+        dog.dogID,
+        dog.name,
+        dog.sex, 
+        dog.adoption_state,
+        dog.alteration_status,
+        dog.age_when_surrender + TIMESTAMPDIFF(MONTH, surrender_date, NOW()) AS current_age_in_months,
+        dog.description,
+        microchip.microchipID, 
+        dog.surrender_date,
+        adoptiondetails.adoption_date,
+        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds, 
+        CASE  
+        WHEN localanimalcontroldepartment.surrenderID IS NOT NULL THEN 'Yes'  
+        ELSE 'No'   
+        END AS Animal_control_surrender_indicator 
+        from dog 
+        LEFT JOIN microchip ON dog.dogID = microchip.dogID
+        LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID
+        LEFT JOIN localanimalcontroldepartment ON dog.surrenderID = localanimalcontroldepartment.surrenderID
+        LEFT JOIN adoptiondetails ON dog.dogID = adoptiondetails.dogID
+        WHERE dog.dogID = ?
+        GROUP BY dog.dogID, dog.name, dog.sex, dog.adoption_state, dog.alteration_status, current_age_in_months, dog.description, microchipID, dog.surrender_date, adoptiondetails.adoption_date, Animal_control_surrender_indicator      
+        """;
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            DogDetailsVO dog = new DogDetailsVO();
+            dog.setDogID(rs.getInt("dogID"));
+            dog.setName(rs.getString("name"));
+            dog.setBreed(rs.getString("breeds"));
+            dog.setSex(Sex.valueOf(rs.getString("sex")));
+            dog.setSurrenderDate(rs.getDate("surrender_date").toLocalDate());
+            if (rs.getString("adoption_date") != null)
+            {
+                dog.setAdoptionDate(rs.getDate("adoption_date").toLocalDate());
+            }
+            dog.setCurrentAgeInMonth(rs.getInt("current_age_in_months"));
+            dog.setAlterationStatus(rs.getBoolean("alteration_status"));
+            dog.setDescription(rs.getString("description"));
+            dog.setAnimalControlSurrenderIndicator(rs.getString("Animal_control_surrender_indicator"));
+            dog.setAdoptionState(rs.getBoolean("adoption_state"));
+            dog.setMicrochipID(rs.getString("microchipID"));
+            return dog;
+        }, dogID);
     }
 }
