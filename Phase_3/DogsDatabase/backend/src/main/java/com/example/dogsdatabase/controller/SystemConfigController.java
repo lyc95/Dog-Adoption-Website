@@ -1,5 +1,6 @@
 package com.example.dogsdatabase.controller;
 
+import com.example.dogsdatabase.common.Result;
 import com.example.dogsdatabase.service.SystemConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class SystemConfigController {
     private final SystemConfigService systemConfigService;
     @GetMapping("/get")
-    public String getSystemConfigByName(@RequestParam String configName) {
-        return systemConfigService.getSystemConfigByName(configName);
+    public Result getSystemConfigByName(@RequestParam String configName) {
+        return Result.success(systemConfigService.getSystemConfigByName(configName));
     }
 
     @PutMapping("/update")

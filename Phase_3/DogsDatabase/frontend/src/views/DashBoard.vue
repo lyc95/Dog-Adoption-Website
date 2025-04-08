@@ -111,46 +111,7 @@
   const router = useRouter()
   const user = JSON.parse(sessionStorage.getItem('user'))
 
-
-  // 加载所有狗
-  // const loadData = () => {
-  //
-  //   request.get('/api/dog/all').then(res => {
-  //
-  //     data.tableData = res.data;
-  //     data.currentDogNum = res.data.length;
-  //   });
-  //
-  //   // request.get('/api/systemConfig/get',  {
-  //   //   params: { configName: 'ShelterSize' } // 示例参数
-  //   // }).then(res => {
-  //   //   console.log("res.data");
-  //   //   console.log(res.data);
-  //   //   data.spaseSize = Number.parseInt(res.data);
-  //   // });
-  //
-  //   //获取每只狗的microchip_id
-  //   for (let i = 0; i < data.tableData.length; i++) {
-  //     const dogID = data.tableData[i].dogID;
-  //     request.get('/api/microchip/get', {
-  //       params: {
-  //         dogID: dogID
-  //       }
-  //     }).then(res => {
-  //       console.log("res.data:");
-  //       console.log(res.data.length);
-  //
-  //       if(res.data.length !== 0 && data.tableData[i].alteration_status === true){
-  //         data.tableData[i].adoption_available_state = 'Available';
-  //       } else{
-  //         data.tableData[i].adoption_available_state = 'Unavailable';
-  //       }
-  //     });
-  //  }
-  //
-  // }
-
-  // 改造后的数据加载逻辑
+  // 初始化页面数据
   const loadData = async () => {
     try {
       // 获取基础数据
@@ -179,15 +140,14 @@
 
       // 原子化更新数据
       data.tableData  = enhancedDogs;
-      console.log(' final table:', JSON.parse(JSON.stringify(data.tableData)));
       //data.currentDogNum 等于enhancedDogs中adoption_state为false的个数
       data.currentDogNum = enhancedDogs.filter(dog => dog.adoption_state === false).length;
       console.log('currentDogNum:', data.currentDogNum);
 
-      const configRes = await request.get('/api/systemConfig/get',  {//TODO 调试前后端
+      const configRes = await request.get('/api/systemConfig/get',  {
         params: { configName: 'ShelterSize'}
       });
-      console.log('configRes.data1:', configRes.data);
+      console.log('configRes:', configRes);
       data.spaseSize = configRes.data;
 
       console.log('configRes.data2:', configRes.data);
@@ -196,8 +156,6 @@
       ElMessage.error(' fail load data');
       console.error(' unknown error:', mainError);
     }
-
-
 
   };
 
