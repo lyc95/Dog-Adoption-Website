@@ -1,4 +1,5 @@
 package com.example.dogsdatabase.controller;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,6 +102,17 @@ public class ExpenseController {
             String searchPattern = pattern.orElse("");
             List<ExpenseCategoryPO> list = expenseService.getExpenseCategories(searchPattern);
             return Result.success(list);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
+
+    @GetMapping("/adoptionFee/{dogId}")
+    public Result getAdoptionFeeByDogId(@PathVariable Integer dogId)
+    {
+        try{
+            BigDecimal adoptionFee = expenseService.getAdoptionFeeByDogId(dogId);
+            return Result.success(adoptionFee);
         } catch (Exception e) {
             return Result.error("500", e.getMessage());
         }
