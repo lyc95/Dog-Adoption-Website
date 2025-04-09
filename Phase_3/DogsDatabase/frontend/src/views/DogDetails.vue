@@ -5,13 +5,26 @@
       <el-descriptions v-if="isDogFetched" :column="2" border>
         <el-descriptions-item label="Dog ID">{{ dog.dogID }}</el-descriptions-item>
         <el-descriptions-item label="Name">{{ dog.name }}</el-descriptions-item>
-        <el-descriptions-item label="Breed">{{ dog.breed }}</el-descriptions-item>
+        <el-descriptions-item label="Breed" >
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>{{ dog.breed }} </span>
+                <el-button  v-if="true" @click="updateBreed" size="mini" type="success" style="width: 100px;">Update</el-button>
+            </div>
+        </el-descriptions-item> 
         <el-descriptions-item label="Sex">{{ dog.sex }}</el-descriptions-item>
         <el-descriptions-item label="Alteration Status">
-          {{ alterationStatusFormatter(dog.alterationStatus) }}
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>{{ alterationStatusFormatter(dog.alterationStatus) }}</span>
+                <el-button v-if="true" @click="updateAlterationStatus" size="mini" type="success" style=" width: 100px;">Update</el-button>
+            </div>
         </el-descriptions-item>
         <el-descriptions-item label="Age">{{ AgeFormatter(dog.currentAgeInMonth) }} </el-descriptions-item>
-        <el-descriptions-item label="Microchip ID">{{ microchipIDFormatter(dog.microchipID) }}</el-descriptions-item>
+        <el-descriptions-item label="Microchip ID">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>{{ microchipIDFormatter(dog.microchipID) }}</span>
+                <el-button v-if="true" @click="AddMicrochip" size="mini" type="success" style=" width: 100px;">Add</el-button>
+            </div>
+        </el-descriptions-item>
         <el-descriptions-item label="Surrender Date">{{ dog.surrenderDate }}</el-descriptions-item>
         <el-descriptions-item label="Surrender phone number" v-if="dog.surrenderPhonenumber">
           {{ dog.surrenderPhonenumber }}
@@ -250,3 +263,14 @@ const rules = {
   ]
 }
 </script>
+
+
+<style scoped>
+.update-button {
+  margin-left: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+</style>
