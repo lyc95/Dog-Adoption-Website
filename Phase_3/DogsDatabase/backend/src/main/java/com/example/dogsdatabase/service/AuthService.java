@@ -7,10 +7,14 @@ import com.example.dogsdatabase.entity.dto.UserDTO;
 import com.example.dogsdatabase.entity.po.UserPO;
 import com.example.dogsdatabase.entity.vo.LoginVO;
 import com.example.dogsdatabase.exception.AuthException;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.Period;
 
 /**
  * @Title: UserService
@@ -28,13 +32,15 @@ public class AuthService {
     public LoginVO login(LoginDTO loginDTO) {
         UserPO user = userDao.getUserByEmail(loginDTO.getEmail());
         if (user == null) { // 用户不存在
-            throw new AuthException("user don't exist!");
+            throw new AuthException("User don't exist!");
         }
         if (!user.getPassword().equals(loginDTO.getPassword())) { // 密码错误
-            throw new AuthException("wrong password!");
+            throw new AuthException("Wrong password!");
         }
-        if(!systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value().equals("")){ // 用户已经登录
-            throw new AuthException("user already logged in!");
+
+        String loggedUser = systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value();
+        if(user.getUser_type().toString().equals("VOLUNTEER") && !loggedUser.equals("")){ // 用户已经登录
+            throw new AuthException("Already have users logged in!");
         }
         systemConfigDao.updateSystemConfig("loggedUser", loginDTO.getEmail());
 
@@ -42,17 +48,27 @@ public class AuthService {
     }
 
     public UserPO logout() {
-        UserPO userPo = userDao.getUserByEmail(systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value());
-        if (userPo == null) { // 用户不存在
+        String loggedUser = systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value();
+        if (loggedUser.equals("")) { // 用户不存在
             throw new AuthException("user don't exist!");
         }
+        UserPO userPo = userDao.getUserByEmail(loggedUser);
         systemConfigDao.updateSystemConfig("loggedUser", "");
         return userPo;
     }
 
     private LoginVO buildLoginVO(UserPO user) {
-        String userType = userDao.getUserType(user.getEmail());
+        String userType = user.getUser_type().toString();
+        int age = calculateAge(user.getBirthday());
 
-        return new LoginVO(user.getEmail(), userType);
+        return new LoginVO(user.getEmail(), userType, age);
+    }
+
+    public int calculateAge(LocalDate birthday) {
+        if (birthday == null) {
+            return 0; // 或抛出异常，取决于业务需求
+        }
+        LocalDate today = LocalDate.now();
+        return Period.between(birthday,  today).getYears();
     }
 }

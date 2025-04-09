@@ -12,7 +12,11 @@ const router = createRouter({
   routes: [
     {path: '/login', name: 'login', component: import('../views/Login.vue')},
     {path: '/dashboard', name: 'Dash Board', component: import('../views/DashBoard.vue')},
-    {path: '/viewDetails', name: 'View Details', component: import('../views/ViewDetails.vue')},
+    {path: '/dogDetails', name: 'Dog Details', component: import('../views/DogDetails.vue')},
+    {path: '/addDog', name: 'Add Dog', component: import('../views/AddDog.vue')},
+    {path: '/addAdoptionApplication', name: 'Add Adoption Application', component: import('../views/AddAdoptionApplication.vue')},
+    {path: '/adoptionApplicationReview', name: 'Adoption Application Review', component: import('../views/AdoptionApplicationReview.vue')},
+    {path: '/addAdoption', name: 'Add Adoption', component: import('../views/AddAdoption.vue')},
     {
       path: '/report', name: 'report', component: ReportDashBoard,
       children: 

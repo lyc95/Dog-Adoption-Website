@@ -36,4 +36,8 @@ public class AdopterService {
     public List<AdopterPO> getAllAdopters() {
         return adopterDao.getAllAdopters();
     }
+
+    public List<AdopterPO> getAdopterByLastname(String firstname) {
+        return adopterDao.getAdopterByLastname(firstname);
+    }
 }

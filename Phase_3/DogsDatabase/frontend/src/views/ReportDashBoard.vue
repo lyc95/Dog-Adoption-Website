@@ -2,7 +2,7 @@
     <div>
          <el-container style="height: 100vh;">
         <!-- Sidebar Menu -->
-        <el-aside width="200px" style="border-right: 1px solid black;" >
+        <el-aside width="270px" heigit=90% style="border-right: 1px solid black;" >
             <el-menu class="el-menu-vertical-demo" style="height: 100%; " :default-active="activeReport">
                 <el-menu-item index="acr" @click="goToReport('acr')">
                 Animal Control Report
@@ -19,7 +19,7 @@
                 <el-menu-item index="vb" @click="goToReport('vb')">
                 Volunteer Birthdays
                 </el-menu-item>
-                <el-menu-item @click="$router.push('/dashboard')">
+                <el-menu-item @click="backToDashBoard">
                 Go Back to Main DashBoard
                 </el-menu-item>
             </el-menu>
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router';
+import {createRouter as $router, useRoute, useRouter} from 'vue-router';
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { computed } from 'vue';
@@ -50,5 +50,11 @@ const activeReport = computed(() => {
 // Navigation helper
 function goToReport(name) {
   router.push(`/report/${name}`);
+}
+
+const backToDashBoard = () => {
+  router.push({
+    path: '/dashboard'
+  })
 }
 </script>

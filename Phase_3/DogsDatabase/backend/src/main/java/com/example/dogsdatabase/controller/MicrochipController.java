@@ -3,14 +3,7 @@ package com.example.dogsdatabase.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.dogsdatabase.common.Result;
 import com.example.dogsdatabase.entity.po.MicrochipPO;
@@ -62,6 +55,17 @@ public class MicrochipController {
         try {
             Integer updatedRows = microchipService.updateMicrochip(microchipPO);
             return Result.success(updatedRows);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
+
+    @GetMapping("/get")
+    public Result getMicrochipByDogID(@RequestParam Integer dogID)
+    {
+        try {
+            List<MicrochipPO> microchipPOS = microchipService.getMicrochipByDogID(dogID);
+            return Result.success(microchipPOS);
         } catch (Exception e) {
             return Result.error("500", e.getMessage());
         }

@@ -6,7 +6,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class LoginVO {
-    private String userType;    // 用户类型（Admin/Casual/Volunteer等）
     private String email;
+    private String userType;    // 用户类型（Admin/ED/Volunteer等）
+    private int age;
     // getters/setters...
 }

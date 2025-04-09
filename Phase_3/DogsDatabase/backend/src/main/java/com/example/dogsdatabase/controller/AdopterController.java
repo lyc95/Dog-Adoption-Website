@@ -43,6 +43,12 @@ public class AdopterController {
         return Result.success(adopter);
     }
 
+    @GetMapping("/lastname/{lastname}")
+    public Result getAdopterByLastname(@PathVariable String lastname) {
+        List<AdopterPO> adopters = adopterService.getAdopterByLastname(lastname);
+        return Result.success(adopters);
+    }
+
     @GetMapping("/all")
     public Result getAllAdopters() {
         List<AdopterPO> adopters = adopterService.getAllAdopters();

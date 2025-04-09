@@ -25,7 +25,7 @@ public class AdoptionApplicationDao {
      */
     public int insertAdoptionApplication(AdoptionApplicationPO application) {
         String sql = "INSERT INTO adoptionapplication (email, application_date) VALUES (?, ?)";
-        return jdbcTemplate.update(sql, application.getEmail(), application.getApplicationDate());
+        return jdbcTemplate.update(sql, application.getEmail(), application.getApplication_date());
     }
 
     /**
@@ -35,7 +35,7 @@ public class AdoptionApplicationDao {
      */
     public int updateAdoptionApplicationState(AdoptionApplicationPO application) {
         String sql = "UPDATE adoptionapplication SET application_state = ? WHERE email = ? AND application_date = ?";
-        return jdbcTemplate.update(sql, application.getApplicationState(), application.getEmail(), application.getApplicationDate());
+        return jdbcTemplate.update(sql, application.getEmail(), application.getApplication_date());
     }
 
     /**
@@ -58,8 +58,7 @@ public class AdoptionApplicationDao {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             AdoptionApplicationPO application = new AdoptionApplicationPO();
             application.setEmail(rs.getString("email"));
-            application.setApplicationDate(rs.getDate("application_date").toLocalDate());
-            application.setApplicationState(rs.getString("application_state"));
+            application.setApplication_date(rs.getDate("application_date").toLocalDate());
             return application;
         });
     }
@@ -74,8 +73,7 @@ public class AdoptionApplicationDao {
         return jdbcTemplate.query(sql, new Object[]{email}, (rs, rowNum) -> {
             AdoptionApplicationPO application = new AdoptionApplicationPO();
             application.setEmail(rs.getString("email"));
-            application.setApplicationDate(rs.getDate("application_date").toLocalDate());
-            application.setApplicationState(rs.getString("application_state"));
+            application.setApplication_date(rs.getDate("application_date").toLocalDate());
             return application;
         });
     }
