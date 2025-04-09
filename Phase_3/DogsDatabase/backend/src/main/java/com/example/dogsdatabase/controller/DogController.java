@@ -1,6 +1,7 @@
 package com.example.dogsdatabase.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.dogsdatabase.common.Result;
+import com.example.dogsdatabase.entity.dto.BreedUpdateDTO;
+import com.example.dogsdatabase.entity.po.BreedPO;
 import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
 import com.example.dogsdatabase.service.DogService;
@@ -73,5 +76,39 @@ public class DogController {
         }
     }
 
+    @PutMapping("/update/alterationstatus/{dogID}")
+    public Result updateAlterationStatus(@PathVariable("dogID") Integer dogID)
+    {
+        try 
+        {
+            int rows = dogService.updateAlterationStatus(dogID);
+            return Result.success(rows);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
+    @GetMapping({"/breeds", "/breeds/{pattern}"})
+    public Result getDogBreeds(@PathVariable(required = false) Optional<String> pattern)
+    {
+        try 
+        {   String searchPattern = pattern.orElse("");
+            List<BreedPO> breeds = dogService.getDogBreeds(searchPattern);
+            return Result.success(breeds);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
+
+    @PutMapping("/update/breeds")
+    public Result updateDogBreeds(@RequestBody BreedUpdateDTO breedUpdateDTO)
+    {
+        try 
+        {   
+            int rows = dogService.updateDogBreeds(breedUpdateDTO.getUpdatedBreeds(), breedUpdateDTO.getDogID());
+            return Result.success(rows);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
 
 }
