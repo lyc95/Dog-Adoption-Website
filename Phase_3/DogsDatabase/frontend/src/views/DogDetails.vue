@@ -168,8 +168,10 @@
 <script setup>
 import { computed, ref , onMounted} from 'vue'
 import request from "@/utils/request.js";
-import { useRoute } from 'vue-router';
+import { useRoute , useRouter} from 'vue-router';
 import { ElMessage } from 'element-plus'
+const router = useRouter()
+const user = JSON.parse(sessionStorage.getItem('user'))
 // variables to show dialog
 const alterationStatusdialogVisible = ref(false)
 const dialogMicrochipFormVisible = ref(false)
@@ -298,7 +300,11 @@ const AgeFormatter = (cellValue) => {
     }
 }
 onMounted(async () => {
-    await fetchDogDetailsData(dogid);
+  if (!user)
+  {
+    await router.push({path: '/login'})
+  }
+  await fetchDogDetailsData(dogid);
 });
 
 const userRole = ref('Executive Director') // Or 'Staff', etc.
@@ -315,7 +321,7 @@ function handleAddAdoption() {
 
 function udpateAdoptability()
 {
-  canAddAdoption.value = dog.value.microchipID != null && dog.value.alterationStatus == true && dog.value.adoptionDate == null && dog.value.adoptionState == false;
+  canAddAdoption.value = (user.userType == 'EXECUTIVEDIRECTOR' && dog.value.microchipID != null && dog.value.alterationStatus == true && dog.value.adoptionDate == null && dog.value.adoptionState == false);
 }
 
 function resetForm(){
