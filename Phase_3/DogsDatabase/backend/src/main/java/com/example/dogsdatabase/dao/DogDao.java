@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.example.dogsdatabase.entity.po.BreedPO;
 import com.example.dogsdatabase.entity.po.DogPO;
 import com.example.dogsdatabase.entity.po.Sex;
 import com.example.dogsdatabase.entity.vo.DogDetailsVO;
@@ -303,5 +304,48 @@ public class DogDao {
             dog.setMicrochipID(rs.getString("microchipID"));
             return dog;
         }, dogID);
+    }
+
+    /* This to to update dog's alteration status to alterated */ 
+    public int updateAlterationStatus(Integer dogID)
+    {
+        String sql = """
+        UPDATE dog
+        SET alteration_status = 1
+        WHERE dogID = ?;
+        """;
+        return jdbcTemplate.update(sql, dogID);
+    }
+    /* This to to get all dog's breeds except mixed and unknown */ 
+    public List<BreedPO> getDogBreeds(String searchPattern)
+    {
+        String sql = """
+            SELECT breedname
+            FROM breed
+            WHERE LOWER(breedname) NOT IN ('mixed', 'unknown') AND LOWER(breedname) LIKE ?;
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new BreedPO(
+            rs.getString("breedname")
+        ), 
+        "%" + searchPattern + "%"
+        );
+    }
+    public int updateDogBreeds(List<String> breeds, Integer dogID)
+    {
+        int rows = 0;
+        String sql = """
+            INSERT INTO dogbreed(dogID, breedname)
+            VALUES(?, ?)
+        """;
+        for (String breed : breeds)
+        {
+            rows += jdbcTemplate.update(sql, dogID, breed);
+        }
+        String sqlToDeleteOutdatedBreed = """
+            DELETE FROM dogbreed 
+            WHERE dogID = ? AND LOWER(breedname) IN ('mixed', 'unknown')
+        """;
+        rows += jdbcTemplate.update(sqlToDeleteOutdatedBreed, dogID);
+        return rows;
     }
 }

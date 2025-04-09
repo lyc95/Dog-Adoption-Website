@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.dogsdatabase.dao.DogDao;
 import com.example.dogsdatabase.dao.ExpenseDAO;
+import com.example.dogsdatabase.entity.po.BreedPO;
 import com.example.dogsdatabase.entity.po.DogPO;
 import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
@@ -110,5 +111,30 @@ public class DogService {
         dogDetailsVO.setDogExpensesList(expensesForDog);
         dogDetailsVO.setGrandTotal(grandTotal);
         return dogDetailsVO;
+    }
+    public int updateAlterationStatus(Integer dogID) throws Exception
+    {
+        if (dogID == null || dogID < 0)
+        {
+            throw new Exception("Error: Invalid Dog ID");
+        }
+        return dogDao.updateAlterationStatus(dogID);
+    }
+
+    public List<BreedPO> getDogBreeds(String searchPattern)
+    {
+        return dogDao.getDogBreeds(searchPattern);
+    }
+    public int updateDogBreeds(List<String> breeds, Integer dogID) throws Exception
+    {
+        if (dogID == null || dogID < 0)
+        {
+            throw new Exception("Error: Invalid Dog ID"); 
+        }
+        else if (breeds.isEmpty())
+        {
+            throw new Exception("Error: Empty breeds"); 
+        }
+        return dogDao.updateDogBreeds(breeds, dogID);
     }
 }
