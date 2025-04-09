@@ -1,20 +1,17 @@
 package com.example.dogsdatabase.controller;
 
-import com.example.dogsdatabase.common.Result;
-import com.example.dogsdatabase.entity.dto.LoginDTO;
-import com.example.dogsdatabase.entity.dto.UserDTO;
-import com.example.dogsdatabase.entity.po.UserPO;
-import com.example.dogsdatabase.entity.vo.LoginVO;
-import com.example.dogsdatabase.exception.AuthException;
-import com.example.dogsdatabase.service.AuthService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import com.example.dogsdatabase.common.Result;
+import com.example.dogsdatabase.entity.dto.LoginDTO;
+import com.example.dogsdatabase.entity.vo.LoginVO;
+import com.example.dogsdatabase.exception.AuthException;
+import com.example.dogsdatabase.service.AuthService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @Title: TestController
@@ -32,6 +29,11 @@ public class AuthController {
     @PostMapping("/login")
     public Result login(@RequestBody LoginDTO loginDTO){
         LoginVO loginVO;
+        //TODO: 
+        /**
+         * If userType is Volunteer, check the limitations and only 1 user can log in concurrently, to reocrd the logged-in in the System config
+         * If userType is not Volunteer, no requriement on limitations yet
+        */
         try{
             loginVO = authService.login(loginDTO);
         }catch (AuthException e){
