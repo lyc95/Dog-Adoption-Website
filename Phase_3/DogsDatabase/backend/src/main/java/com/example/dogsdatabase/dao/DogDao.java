@@ -99,7 +99,7 @@ public class DogDao {
         }
         if (dog.getSex() != null) {
             sql.append("sex = ?, ");
-            params.add(dog.getSex());
+            params.add(dog.getSex().name()); // Returns "Male", "Female", or "Unknown"
         }
         if (dog.getSurrender_date() != null) {
             sql.append("surrender_date = ?, ");

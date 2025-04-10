@@ -52,8 +52,9 @@ public class DogController {
     }
 
     @PostMapping("/insert")
-    public int insertDog(@RequestBody DogVO dogVO) {
-        return dogService.insertDog(dogVO);
+    public Result insertDog(@RequestBody DogVO dogVO) {
+
+        return Result.success(dogService.insertDog(dogVO));
     }
 
     @PutMapping("/update")

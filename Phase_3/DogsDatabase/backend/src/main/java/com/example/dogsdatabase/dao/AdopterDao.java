@@ -119,7 +119,10 @@ public class AdopterDao {
 
     public List<AdopterPO> getAdopterByLastname(String lastname) {
         // 方法更名为getAdopterByLastname，参数名更准确
-        String sql = "SELECT * FROM adopter WHERE LOWER(lastname) LIKE LOWER(?)";
+        String sql = "SELECT DISTINCT * FROM adopter a " +
+                "JOIN approvedapplication aa " +
+                "ON a.email = aa.email " +
+                "WHERE LOWER(lastname) LIKE LOWER(?) AND application_state = 'APPROVED'";
         // 添加通配符实现模糊匹配
         String searchTerm = "%" + lastname + "%";
         return jdbcTemplate.query(sql, new Object[]{searchTerm}, (rs, rowNum) -> {
