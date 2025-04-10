@@ -10,6 +10,7 @@ import com.example.dogsdatabase.dao.AdopterDao;
 import com.example.dogsdatabase.dao.AdoptionApplicationDao;
 import com.example.dogsdatabase.entity.po.AdopterPO;
 import com.example.dogsdatabase.entity.po.AdoptionApplicationPO;
+import com.example.dogsdatabase.entity.vo.AdoptionApplicationDisplayVO;
 import com.example.dogsdatabase.entity.vo.AdoptionApplicationVO;
 
 /**
@@ -70,5 +71,25 @@ public class AdoptionApplicationService {
         }
         AdoptionApplicationPO newApplication = new AdoptionApplicationPO(email, adoptionApplicationVO.getDate());
         return adoptionApplicationDao.insertAdoptionApplication(newApplication);
+    }
+    public List<AdoptionApplicationDisplayVO> getAllPendingAdoptionApplication()
+    {
+        return adoptionApplicationDao.getAllPendingAdoptionApplication();
+    }
+    public List<AdoptionApplicationDisplayVO> getAllApprovedAdoptionApplication()
+    {
+        return adoptionApplicationDao.getAllApprovedAdoptionApplication();
+    }
+    public List<AdoptionApplicationDisplayVO> getAllRejectedAdoptionApplication()
+    {
+        return adoptionApplicationDao.getAllRejectedAdoptionApplication();
+    }
+    public int approveApplication(AdoptionApplicationPO adoptionApplicationPO)
+    {
+        return adoptionApplicationDao.approveApplication(adoptionApplicationPO);
+    }
+    public int rejectApplication(AdoptionApplicationPO adoptionApplicationPO)
+    {
+        return adoptionApplicationDao.rejectApplication(adoptionApplicationPO);
     }
 }
