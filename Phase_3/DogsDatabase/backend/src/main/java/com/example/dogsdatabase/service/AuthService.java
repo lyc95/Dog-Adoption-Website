@@ -31,29 +31,31 @@ public class AuthService {
 
     public LoginVO login(LoginDTO loginDTO) {
         UserPO user = userDao.getUserByEmail(loginDTO.getEmail());
-        if (user == null) { // 用户不存在
-            throw new AuthException("User don't exist!");
-        }
-        if (!user.getPassword().equals(loginDTO.getPassword())) { // 密码错误
-            throw new AuthException("Wrong password!");
+//        if (user == null) { // 用户不存在
+//            throw new AuthException("User don't exist!");
+//        }
+        if (user == null || !user.getPassword().equals(loginDTO.getPassword())) { // 密码错误
+            throw new AuthException("Wrong account or password!");
         }
 
         String loggedUser = systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value();
-        if(user.getUser_type().toString().equals("VOLUNTEER") && !loggedUser.equals("")){ // 用户已经登录
-            throw new AuthException("Already have users logged in!");
+        if(user.getUser_type().toString().equals("VOLUNTEER")){ // 用户是VOLUNTEER
+            if(!loggedUser.equals("")){ //已有VOLUNTEER用户登陆
+                throw new AuthException("Already have users logged in!");
+            }
+            systemConfigDao.updateSystemConfig("loggedUser", loginDTO.getEmail());
         }
-        systemConfigDao.updateSystemConfig("loggedUser", loginDTO.getEmail());
+
 
         return buildLoginVO(user);
     }
 
     public UserPO logout() {
         String loggedUser = systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value();
-        if (loggedUser.equals("")) { // 用户不存在
-            throw new AuthException("user don't exist!");
-        }
         UserPO userPo = userDao.getUserByEmail(loggedUser);
-        systemConfigDao.updateSystemConfig("loggedUser", "");
+        if(userPo.getUser_type().toString().equals("VOLUNTEER")) { // 用户是VOLUNTEER
+            systemConfigDao.updateSystemConfig("loggedUser", "");
+        }
         return userPo;
     }
 

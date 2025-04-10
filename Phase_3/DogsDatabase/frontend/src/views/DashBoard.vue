@@ -164,11 +164,9 @@
   const viewDetailsClick = (rowData) => {
 
     router.push({
-      path: '/viewDetails',
+      path: '/dogDetails',
       query: {
-        dogID: rowData.dogID,   // 传递目标参数
-        // 可附加其他字段（可选）
-        name: rowData.name
+        dogID: rowData.dogID,   // 传递目标DogID
       }
     })
   }
@@ -209,7 +207,7 @@
   }
 
   // 更新空间
-  const updateSpaseClick = () => {//TODO 调试前后端
+  const updateSpaseClick = () => {
     request.put('/api/systemConfig/update', {
       configName: 'ShelterSize',
       configValue: data.inputShelterSize
@@ -228,9 +226,7 @@
     request.post('/api/auth/logout').then(res => {
       console.log(res)
       if (res.code === '200') {
-        // TODO: clear the session storgae 
-
-
+        sessionStorage.removeItem('user');
         ElMessage.success("Logout Successfully")
         setTimeout(() => {
           window.location.href = '/login'

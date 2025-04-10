@@ -14,7 +14,7 @@ import java.time.LocalDate;
  */
 @Data
 public class AdoptionDetailsPO {
-    private Integer adoptionDetailsID;
+    private Integer dogID;
     private String email;
     private LocalDate application_date;
     private LocalDate adoption_date;
