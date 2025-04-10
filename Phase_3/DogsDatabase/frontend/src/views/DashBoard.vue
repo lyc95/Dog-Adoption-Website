@@ -228,6 +228,9 @@
     request.post('/api/auth/logout').then(res => {
       console.log(res)
       if (res.code === '200') {
+        // TODO: clear the session storgae 
+
+
         ElMessage.success("Logout Successfully")
         setTimeout(() => {
           window.location.href = '/login'

@@ -5,13 +5,26 @@
       <el-descriptions v-if="isDogFetched" :column="2" border>
         <el-descriptions-item label="Dog ID">{{ dog.dogID }}</el-descriptions-item>
         <el-descriptions-item label="Name">{{ dog.name }}</el-descriptions-item>
-        <el-descriptions-item label="Breed">{{ dog.breed }}</el-descriptions-item>
+        <el-descriptions-item label="Breed" >
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>{{ dog.breed }} </span>
+                <el-button  v-if="showUpdateBreedBtn" @click="dialogBreedFormVisible = true" size="default" type="success" style="width: 100px;">Update</el-button>
+            </div>
+        </el-descriptions-item> 
         <el-descriptions-item label="Sex">{{ dog.sex }}</el-descriptions-item>
         <el-descriptions-item label="Alteration Status">
-          {{ alterationStatusFormatter(dog.alterationStatus) }}
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>{{ alterationStatusFormatter(dog.alterationStatus) }}</span>
+                <el-button v-if="showAlterationStatusBtn" @click="alterationStatusdialogVisible = true" size="default" type="success" style=" width: 100px;">Update</el-button>
+            </div>
         </el-descriptions-item>
         <el-descriptions-item label="Age">{{ AgeFormatter(dog.currentAgeInMonth) }} </el-descriptions-item>
-        <el-descriptions-item label="Microchip ID">{{ microchipIDFormatter(dog.microchipID) }}</el-descriptions-item>
+        <el-descriptions-item label="Microchip ID">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>{{ microchipIDFormatter(dog.microchipID) }}</span>
+                <el-button v-if="showAddMicrochipBtn" @click="dialogMicrochipFormVisible = true" size="default" type="success" style=" width: 100px;">Add</el-button>
+            </div>
+        </el-descriptions-item>
         <el-descriptions-item label="Surrender Date">{{ dog.surrenderDate }}</el-descriptions-item>
         <el-descriptions-item label="Surrender phone number" v-if="dog.surrenderPhonenumber">
           {{ dog.surrenderPhonenumber }}
@@ -20,6 +33,9 @@
           {{ dog.animalControlSurrenderIndicator }}
         </el-descriptions-item>
         <el-descriptions-item label="Description" v-if="dog.description" :span="2">{{ dog.description }}</el-descriptions-item>
+        <el-descriptions-item label="Adoption Status" :span="2">
+          {{ dog.adoptionState ? 'ADOPTED' : ' NOT ADOPTED' }}
+        </el-descriptions-item>
       </el-descriptions>
       
       <!-- Conditional Add Adoption -->
@@ -44,7 +60,7 @@
         <el-button v-if= "isDogFetched" type="primary" @click="handleAddExpenseBtn">Add Expense</el-button>
 
         <!-- Form to add expense -->
-        <el-dialog title="Add Expense" v-model="showForm" width="800px" @close="resetForm">
+        <el-dialog title="Add Expense" style="text-align: center;" v-model="showForm" width="800px" @close="resetForm">
             <el-form :model="form" :rules="rules" ref="expenseForm" label-width="200px">
                 <el-form-item label="Vendor Name" prop="vendorName">
                     <el-input v-model="form.vendorName" />
@@ -71,7 +87,7 @@
             </el-form>
         <template #footer>
             <el-button @click="showForm = false">Cancel</el-button>
-            <el-button type="primary" @click="submitForm">Add</el-button>
+            <el-button type="primary" @click="submitExpenseForm">Add</el-button>
         </template>
         </el-dialog>
         </div>
@@ -81,17 +97,97 @@
     </div>
     </el-card>
 
+    <!-- diaglog to update dog's alteration status -->
+    <el-dialog v-model="alterationStatusdialogVisible" title="Change Dog's Alteration Status" width="500" >
+    <span>Do you confirm you want to update the alteration status to 'altered'?</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="alterationStatusdialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="setDogAlterationStatus(dogid)">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- diaglog to update dog's Microchip -->
+  <el-dialog v-model="dialogMicrochipFormVisible" title="Add Microchip" width="500">
+    <el-form :model="microchipForm">
+      <el-form-item label="Microchip Vendor:" :label-width="formLabelWidth">
+        <el-select
+          v-model="microchipForm.manufactureName"
+          placeholder="Please select a Microchip Vendor from list"
+          filterable
+          remote
+          :remote-method="fetchMicrochipVendors">
+          <el-option v-for="item in microchipVendors" :key="item.manufactureName" :label="item.manufactureName" :value="item.manufactureName" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Microchip ID:" :label-width="formLabelWidth">
+        <el-input v-model="microchipForm.microchipID" autocomplete="off" />
+      </el-form-item>
+
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogMicrochipFormVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="addMicrochip(dogid)">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- diaglog to update dog's breed -->
+  <el-dialog v-model="dialogBreedFormVisible" title="Update Dog's Breed" width="500">
+    <el-form :model="breedForm" >
+      <el-form-item label="Selected Breed: " :label-width="formLabelWidth">
+        <el-select-v2
+          v-model="breedForm.selectedBreeds"
+          filterable
+          placeholder="Please select breed(s)"
+          style="width: 240px"
+          multiple
+          remote
+          :options="dogBreeds"
+          :remote-method="fetchDogBreeds" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogBreedFormVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="addBreeds">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
   
 <script setup>
 import { computed, ref , onMounted} from 'vue'
 import request from "@/utils/request.js";
-import { useRoute } from 'vue-router';
+import { useRoute , useRouter} from 'vue-router';
+import { ElMessage } from 'element-plus'
+const router = useRouter()
+const user = JSON.parse(sessionStorage.getItem('user'))
+// variables to show dialog
+const alterationStatusdialogVisible = ref(false)
+const dialogMicrochipFormVisible = ref(false)
+const dialogBreedFormVisible = ref(false)
+
 const route = useRoute();
 const dogid = route.params.dogid;
 const dog = ref({})
 const expenses = ref([])
 const showForm = ref(false)
+// variables to show Btns
+const showAlterationStatusBtn = ref(false)
+const showUpdateBreedBtn = ref(false)
+const showAddMicrochipBtn = ref(false)
+const canAddAdoption = ref(false)
+
 const isDogFetched = ref(false)
 async function fetchDogDetailsData(dogID) {
   try {
@@ -99,15 +195,25 @@ async function fetchDogDetailsData(dogID) {
     dog.value = response.data;
     expenses.value = response.data.dogExpensesList
     isDogFetched.value = true
-    console.log(response)
+    console.log(dog.value)
+    if (dog.value.alterationStatus != true) {
+      showAlterationStatusBtn.value = true;
+    }
+    if (dog.value.microchipID == null)
+    {
+      showAddMicrochipBtn.value = true;
+    }
+    if (dog.value.breed == null || dog.value.breed.includes("Mixed") || dog.value.breed.includes("Unknown"))
+    {
+      showUpdateBreedBtn.value = true
+    }
+    udpateAdoptability();
   } catch (error) {
     console.error('Failed to fetch data:', error)
     dog.value = null
     expenses.value = null
     isDogFetched.value = false
   }
-  console.log(dog)
-
 }
 async function fetchCategories(query) {
     try {
@@ -123,6 +229,42 @@ async function fetchCategories(query) {
         categories.value = []
     }
 }
+
+async function fetchMicrochipVendors(query)
+{
+  try {
+        let url = "/api/microchip/vendor"
+        if (query)
+        {
+            url = `/api/microchip/vendor/${query}`
+        }
+        const response = await request.get(url)
+        microchipVendors.value = response.data;
+    } catch (error) {
+        console.error('Failed to fetch data:', error)
+        microchipVendors.value = []
+    }
+}
+
+async function fetchDogBreeds(query)
+{
+  try {
+        let url = "/api/dog/breeds"
+        if (query)
+        {
+            url = `/api/dog/breeds/${query}`
+        }
+        const response = await request.get(url)
+        dogBreeds.value = response.data.map(breed => ({
+          value: breed.breedname,
+          label: breed.breedname
+        }));
+    } catch (error) {
+        console.error('Failed to fetch data:', error)
+        dogBreeds.value = []
+    }
+}
+
 const currencyFormatter = (row, column, cellValue) => {
 
   return `$${parseFloat(cellValue).toFixed(2)}`
@@ -158,18 +300,14 @@ const AgeFormatter = (cellValue) => {
     }
 }
 onMounted(async () => {
-    fetchDogDetailsData(dogid);
+  if (!user)
+  {
+    await router.push({path: '/login'})
+  }
+  await fetchDogDetailsData(dogid);
 });
 
 const userRole = ref('Executive Director') // Or 'Staff', etc.
-
-const canAddAdoption = computed(() =>
-    isDogFetched &&
-    dog.value.microchipID != null &&
-    dog.value.alterationStatus == true &&
-    dog.value.adoptionDate == null &&
-    dog.value.adoptionState == false
-)
 
 // Actions
 function handleAddExpenseBtn() {
@@ -177,8 +315,15 @@ function handleAddExpenseBtn() {
 }
 
 function handleAddAdoption() {
+  // to be updated
     console.log('Added ')
 }
+
+function udpateAdoptability()
+{
+  canAddAdoption.value = (user.userType == 'EXECUTIVEDIRECTOR' && dog.value.microchipID != null && dog.value.alterationStatus == true && dog.value.adoptionDate == null && dog.value.adoptionState == false);
+}
+
 function resetForm(){
     form.value.amount = null;
     form.value.date = '';
@@ -193,7 +338,7 @@ function formatDate(date) {
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
-async function submitForm()
+async function submitExpenseForm()
 {
     const formdata = {
         dogID:dogid,
@@ -202,27 +347,38 @@ async function submitForm()
         expenseDate:formatDate(form.value.date),
         amount:form.value.amount
     };
-    // console.log(formdata)
-    try {
-        const response = await request.post(`/api/expense/check`, formdata);
-        if (response.data == 1)
-        {
-            alert('There is already a expense with same vendor name and date');
-        }
-        else
-        {
-            // To add expenseadd
-            request.post(`/api/expense/add`, formdata);
-            isDogFetched.value = false
-            showForm.value = false
-            resetForm();
-            // This is wo wait 
-            await wait(100);
-            //fetch again
-            await fetchDogDetailsData(dogid);
-        }
-    } catch (error) {
-        console.error('Failed to fetch data:', error)
+    if (!formdata.vendorName || !formdata.category || !formdata.expenseDate || !formdata.amount)
+    {
+      errorMsg('All input can not be empty !');
+    }
+    else if (new Date(dog.value.surrenderDate) > new Date(formdata.expenseDate))
+    {
+      errorMsg('The Expense Date must not eariler than its surrender date !');
+    }
+    else
+    {
+      try {
+      const response = await request.post(`/api/expense/check`, formdata);
+      if (response.data == 1)
+      {
+          errorMsg('There is already a expense with same vendor name and date');
+      }
+      else
+      {
+          // To add expenseadd
+          await request.post(`/api/expense/add`, formdata);
+          isDogFetched.value = false
+          showForm.value = false
+          resetForm();
+          // This is wo wait 
+          await wait(100);
+          //fetch again
+          await fetchDogDetailsData(dogid);
+          successfulMsg('Congrats, the expense is added successfully.');
+      }
+      } catch (error) {
+          console.error('Failed to fetch data:', error)
+      }
     }
 }
 const form = ref({
@@ -231,7 +387,19 @@ const form = ref({
   vendorName: '',
   category: ''
 })
+const microchipForm = ref({
+  microchipID: '',
+  manufactureName : ''
+})
+const breedForm = ref({
+  selectedBreeds: []
+})
+
+// list read from api
 const categories = ref([])
+const microchipVendors = ref([])
+const dogBreeds = ref([])
+
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -249,4 +417,109 @@ const rules = {
     { required: true, message: 'Please select a category', trigger: 'change' }
   ]
 }
+
+async function setDogAlterationStatus(dogID)
+{
+
+  //Call API to update alteration status
+  try {
+    const response = await request.put(`/api/dog/update/alterationstatus/${dogID}`);
+    // Disabled the diag and Btn for updating the alteration status
+    alterationStatusdialogVisible.value = false
+    dog.value.alterationStatus = true
+    showAlterationStatusBtn.value = false
+    successfulMsg('Congrats, The Alteration Status is updated');
+    udpateAdoptability();
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+  }
+}
+async function addMicrochip(dogID)
+{
+  //Call API to update alteration status
+  const formdata = {
+    dogID:dogid,
+    microchipID: microchipForm.value.microchipID,
+    manufactureName: microchipForm.value.manufactureName
+  };
+  if (!formdata.microchipID || !formdata.manufactureName)
+  {
+    errorMsg('Please input both microchipID and Microchip Vendor Name!');
+  }
+  else
+  {
+    
+    try 
+    {
+      /* Check uniqueness of input microchipID */
+      const checkResponse = await request.get(`/api/microchip/check/${formdata.microchipID}`);
+      if (checkResponse.data > 0)
+      {
+        errorMsg("Microchip ID is not unique and is already existed in our record!");
+      }
+      else
+      {
+        const response = await request.post(`/api/microchip/add`, formdata);
+        // Disabled the diag and Btn for adding the microchip
+        dialogMicrochipFormVisible.value = false
+        dog.value.microchipID = formdata.microchipID
+        showAddMicrochipBtn.value = false
+        successfulMsg('Congrats, The Microchip information has been added !');
+        udpateAdoptability();
+      }
+    } catch (error) {
+      console.error('Failed to fetch data:', error)
+    }
+  }
+}
+
+async function addBreeds(dogID)
+{
+  const formdata = {
+    dogID: dogid,
+    updatedBreeds: breedForm.value.selectedBreeds
+  };
+
+  if (formdata.updatedBreeds.length === 0)
+  {
+    errorMsg('Please select al least one breed for the dog!');
+  }
+  else
+  {
+    try {
+      const response = await request.put(`/api/dog/update/breeds`, formdata);
+      // Disabled the diag and Btn for adding the microchip
+      dialogBreedFormVisible.value = false
+      dog.value.breed = formdata.updatedBreeds.sort().join(', ');
+      showUpdateBreedBtn.value = false
+      successfulMsg('Congrats, The Breed information has been added !');
+    } catch (error) {
+      console.error('Failed to fetch data:', error)
+    }
+  }
+}
+const successfulMsg = (text) => {
+  ElMessage({
+    message: text,
+    type: 'success',
+    plain: true,
+  })
+}
+const errorMsg = (text) => {
+  ElMessage({
+    message: text,
+    type: 'error',
+    plain: true,
+  })
+}
 </script>
+
+<style scoped>
+.update-button {
+  margin-left: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+</style>

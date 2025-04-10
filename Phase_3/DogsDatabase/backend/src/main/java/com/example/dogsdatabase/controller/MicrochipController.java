@@ -3,7 +3,15 @@ package com.example.dogsdatabase.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.dogsdatabase.common.Result;
 import com.example.dogsdatabase.entity.po.MicrochipPO;
@@ -88,6 +96,17 @@ public class MicrochipController {
             String searchPattern = pattern.orElse("");
             List<MicrochipVendorPO> result = microchipService.getMicrochipVendors(searchPattern);
             return Result.success(result);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
+    @GetMapping("/check/{microchipID}")
+    public Result checkMicrochipIDIsUnique(@PathVariable String microchipID)
+    {
+        try 
+        {
+            int recordsFound = microchipService.getMicrochip(microchipID).size();
+            return Result.success(recordsFound);
         } catch (Exception e) {
             return Result.error("500", e.getMessage());
         }
