@@ -178,7 +178,7 @@ const dialogMicrochipFormVisible = ref(false)
 const dialogBreedFormVisible = ref(false)
 
 const route = useRoute();
-const dogid = route.params.dogid;
+const dogid = route.query.dogID;
 const dog = ref({})
 const expenses = ref([])
 const showForm = ref(false)

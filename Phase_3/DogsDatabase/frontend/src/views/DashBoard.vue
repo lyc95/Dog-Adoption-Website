@@ -164,11 +164,11 @@
   const viewDetailsClick = (rowData) => {
 
     router.push({
-      path: '/viewDetails',
+      path: '/dogDetails',
       query: {
         dogID: rowData.dogID,   // 传递目标参数
         // 可附加其他字段（可选）
-        name: rowData.name
+        // name: rowData.name
       }
     })
   }

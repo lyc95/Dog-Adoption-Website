@@ -1,14 +1,4 @@
 <template>
-<!--  <div class="flex gap-4 mb-4">-->
-<!--    <span>Search by last name</span>-->
-<!--    <el-input-->
-<!--        v-model="adopterLastName"-->
-<!--        style="width: 240px"-->
-<!--        placeholder="Search by last name"-->
-<!--        :prefix-icon="Search"-->
-<!--    />-->
-<!--    <el-button type="primary" @click="searchByLastName">Search</el-button>-->
-<!--  </div>-->
   <el-row>
     <el-col :span="24">
       <span style="font-size: 18px; font-weight: bold;">Adoption Date</span>
