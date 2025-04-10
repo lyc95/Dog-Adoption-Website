@@ -1,13 +1,23 @@
 package com.example.dogsdatabase.controller;
 
-import com.example.dogsdatabase.common.Result;
-import com.example.dogsdatabase.entity.po.AdoptionApplicationPO;
-import com.example.dogsdatabase.service.AdoptionApplicationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.dogsdatabase.common.Result;
+import com.example.dogsdatabase.entity.po.AdoptionApplicationPO;
+import com.example.dogsdatabase.entity.vo.AdoptionApplicationVO;
+import com.example.dogsdatabase.service.AdoptionApplicationService;
+
 
 /**
  * @Title: AdoptionApplicationController
@@ -37,6 +47,11 @@ public class AdoptionApplicationController {
         int result = adoptionApplicationService.deleteAdoptionApplication(email, applicationDate);
         return Result.success(result);
     }
+    @GetMapping("/check/{email}/{applicationDate}")
+    public Result checkAdoptionApplication(@PathVariable String email, @PathVariable LocalDate applicationDate) {
+        int result = adoptionApplicationService.checkAdoptionApplication(email, applicationDate);
+        return Result.success(result);
+    }
 
     @GetMapping("/all")
     public Result getAllAdoptionApplications() {
@@ -48,5 +63,16 @@ public class AdoptionApplicationController {
     public Result getAdoptionApplicationsByEmail(@PathVariable String email) {
         List<AdoptionApplicationPO> applications = adoptionApplicationService.getAdoptionApplicationsByEmail(email);
         return Result.success(applications);
+    }
+    
+    @PostMapping("/add")
+    public Result createNewAdoptionApplication(@RequestBody AdoptionApplicationVO adoptionApplicationVO) {
+        try
+        {
+            int affectedRows = adoptionApplicationService.createNewAdoptionApplication(adoptionApplicationVO);
+            return Result.success(affectedRows);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
     }
 }

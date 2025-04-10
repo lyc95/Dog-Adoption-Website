@@ -1,21 +1,25 @@
-package com.example.dogsdatabase.entity.po;
+package com.example.dogsdatabase.entity.vo;
+
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class AdopterPO {
-    private String email;        // 主键 
+@NoArgsConstructor
+public class AdoptionApplicationVO {
+
+    private String email;
+    private LocalDate date;
     private String phone_number;
-    private Integer household_size; // 家庭人口数
+    private Integer household_size;
     private String firstname;
     private String lastname;
     private String street;
     private String city;
     private String state;
     private String zipcode;
-    // getters/setters...
+    
 }

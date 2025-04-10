@@ -1,11 +1,16 @@
 package com.example.dogsdatabase.service;
 
-import com.example.dogsdatabase.dao.AdoptionApplicationDao;
-import com.example.dogsdatabase.entity.po.AdoptionApplicationPO;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.example.dogsdatabase.dao.AdopterDao;
+import com.example.dogsdatabase.dao.AdoptionApplicationDao;
+import com.example.dogsdatabase.entity.po.AdopterPO;
+import com.example.dogsdatabase.entity.po.AdoptionApplicationPO;
+import com.example.dogsdatabase.entity.vo.AdoptionApplicationVO;
 
 /**
  * @Title: AdoptionApplicationService
@@ -16,6 +21,8 @@ public class AdoptionApplicationService {
 
     @Autowired
     private AdoptionApplicationDao adoptionApplicationDao;
+
+    @Autowired AdopterDao adopterDao;
 
     public int insertAdoptionApplication(AdoptionApplicationPO application) {
         return adoptionApplicationDao.insertAdoptionApplication(application);
@@ -35,5 +42,33 @@ public class AdoptionApplicationService {
 
     public List<AdoptionApplicationPO> getAdoptionApplicationsByEmail(String email) {
         return adoptionApplicationDao.getAdoptionApplicationsByEmail(email);
+    }
+
+    public int checkAdoptionApplication(String email, LocalDate applicationDate)
+    {
+        return adoptionApplicationDao.checkAdoptionApplication(email, applicationDate);
+    }
+    public int createNewAdoptionApplication(AdoptionApplicationVO adoptionApplicationVO)
+    {
+        String email = adoptionApplicationVO.getEmail();
+        /* Check if this adopter is new  */
+        if (adopterDao.getAdopterByEmail(email) == null)
+        {
+            /* The adopter is new and need to create adopter first*/
+            AdopterPO newAdopter = new AdopterPO(
+                adoptionApplicationVO.getEmail(),
+                adoptionApplicationVO.getPhone_number(),
+                adoptionApplicationVO.getHousehold_size(),
+                adoptionApplicationVO.getFirstname(),
+                adoptionApplicationVO.getLastname(),
+                adoptionApplicationVO.getStreet(),
+                adoptionApplicationVO.getCity(),
+                adoptionApplicationVO.getState(),
+                adoptionApplicationVO.getZipcode()
+            );
+            adopterDao.insertAdopter(newAdopter);
+        }
+        AdoptionApplicationPO newApplication = new AdoptionApplicationPO(email, adoptionApplicationVO.getDate());
+        return adoptionApplicationDao.insertAdoptionApplication(newApplication);
     }
 }

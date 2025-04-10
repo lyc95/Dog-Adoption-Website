@@ -1,12 +1,13 @@
 package com.example.dogsdatabase.dao;
 
-import com.example.dogsdatabase.entity.po.AdoptionApplicationPO;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.time.LocalDate;
+import com.example.dogsdatabase.entity.po.AdoptionApplicationPO;
 
 /**
  * @Title: AdoptionApplicationDao
@@ -76,5 +77,10 @@ public class AdoptionApplicationDao {
             application.setApplication_date(rs.getDate("application_date").toLocalDate());
             return application;
         });
+    }
+    public int checkAdoptionApplication(String email, LocalDate applicationDate)
+    {
+        String sql = "SELECT * FROM adoptionapplication WHERE email = ? AND application_date = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new AdoptionApplicationPO(), email, applicationDate).size();
     }
 }

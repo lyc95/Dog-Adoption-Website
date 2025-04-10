@@ -1,11 +1,12 @@
 package com.example.dogsdatabase.dao;
 
-import com.example.dogsdatabase.entity.po.AdopterPO;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.example.dogsdatabase.entity.po.AdopterPO;
 
 /**
  * @Title: AdopterDao
@@ -72,7 +73,7 @@ public class AdopterDao {
      */
     public AdopterPO getAdopterByEmail(String email) {
         String sql = "SELECT * FROM adopter WHERE email = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{email}, (rs, rowNum) -> {
+        List<AdopterPO> adopterPOs = jdbcTemplate.query(sql, (rs, rowNum) -> {
             AdopterPO adopter = new AdopterPO();
             adopter.setEmail(rs.getString("email"));
             adopter.setPhone_number(rs.getString("phone_number"));
@@ -84,7 +85,15 @@ public class AdopterDao {
             adopter.setState(rs.getString("state"));
             adopter.setZipcode(rs.getString("zipcode"));
             return adopter;
-        });
+        }, email);
+        if (!adopterPOs.isEmpty())
+        {
+            return adopterPOs.get(0);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /**
