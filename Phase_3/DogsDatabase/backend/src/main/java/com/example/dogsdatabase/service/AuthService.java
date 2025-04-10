@@ -40,11 +40,12 @@ public class AuthService {
 
         String loggedUser = systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value();
         if(user.getUser_type().toString().equals("VOLUNTEER")){ // 用户是VOLUNTEER
-            if(!loggedUser.equals("")){ //已有VOLUNTEER用户登陆
+            if(loggedUser != null && !loggedUser.isEmpty()){ //已有VOLUNTEER用户登陆
                 throw new AuthException("Already have users logged in!");
             }
             systemConfigDao.updateSystemConfig("loggedUser", loginDTO.getEmail());
         }
+
 
 
         return buildLoginVO(user);
@@ -54,7 +55,7 @@ public class AuthService {
         String loggedUser = systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value();
         UserPO userPo = userDao.getUserByEmail(loggedUser);
         if(userPo.getUser_type().toString().equals("VOLUNTEER")) { // 用户是VOLUNTEER
-            systemConfigDao.updateSystemConfig("loggedUser", "");
+            systemConfigDao.updateSystemConfig("loggedUser", null);
         }
         return userPo;
     }
