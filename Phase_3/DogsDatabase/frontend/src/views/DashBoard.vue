@@ -162,7 +162,6 @@
 
   // 查看详情
   const viewDetailsClick = (rowData) => {
-
     router.push({
       path: '/dogDetails',
       query: {

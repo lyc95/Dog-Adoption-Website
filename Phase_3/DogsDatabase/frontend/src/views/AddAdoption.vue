@@ -119,16 +119,13 @@
 import { Search } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 import {ref} from "vue";
-
-// import {useRoute} from "vue-router"; // 导入你封装的axios实例
-// const route = useRoute();
-// const dogid = route.query.dogID;
-
+import { useRoute , useRouter} from 'vue-router';
 
 export default {
   data() {
+    const dogid = this.$route.query.dogID || null
     return {
-      dogId:4,//修改传参
+      dogId:dogid,
       AdopterTableData: [],
       adopterLastName: '',
       loading: false,
@@ -239,7 +236,14 @@ export default {
       console.log('adoptionDetailsForm: ', adoptionDetailsForm);
       this.addAdoptionDetails(adoptionDetailsForm);
       this.dialogFormVisible = false;
-
+      /* go back to dog details */
+      const router = useRouter()
+      this.$router.push({
+        path: '/dogDetails',
+        query: {
+          dogID: this.$route.query.dogID, 
+        }
+      });
     },
     addAdoptionDetails(form){
       request.post('/api/adoptionDetails', form);

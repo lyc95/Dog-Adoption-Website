@@ -318,14 +318,17 @@ const backToDashBoard = () => {
 }
 // Actions
 function handleAddExpenseBtn() {
-    showForm.value = true
+  showForm.value = true
 }
 
-function handleAddAdoption() {
-  // to be updated
-    console.log('Added ')
+const handleAddAdoption = () => {
+  router.push({
+    path: '/addAdoption',
+    query: {
+      dogID: dogid,
+    }
+  })
 }
-
 function udpateAdoptability()
 {
   canAddAdoption.value = (user.userType == 'EXECUTIVEDIRECTOR' && dog.value.microchipID != null && dog.value.alterationStatus == true && dog.value.adoptionDate == null && dog.value.adoptionState == false);
