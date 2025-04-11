@@ -175,4 +175,8 @@ public class DogService {
         }
         return dogID;
     }
+    public List<Integer> getSpecialDogIDs()
+    {
+        return dogDao.getSpecialDogIDs();
+    }
 }

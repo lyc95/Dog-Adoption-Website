@@ -19,9 +19,8 @@ public class ViewDAO {
     public List<MonthlyAdoptionReportItemVO> getMonthlyAdoptionReport() {
         String sql = """
         WITH PAST_12MTHS AS (
-        SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (m-1) MONTH), '%Y-%m') AS month 
-        FROM ( SELECT 0 AS m UNION ALL 
-            SELECT 1 UNION ALL 
+        SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (m) MONTH), '%Y-%m') AS month 
+        FROM ( SELECT 1 AS m UNION ALL
             SELECT 2 UNION ALL 
             SELECT 3 UNION ALL 
             SELECT 4 UNION ALL 
@@ -31,7 +30,8 @@ public class ViewDAO {
             SELECT 8 UNION ALL 
             SELECT 9 UNION ALL 
             SELECT 10 UNION ALL 
-            SELECT 11
+            SELECT 11 UNION ALL 
+            SELECT 12
         ) AS months),
         DOG_STATUS AS (
         SELECT 

@@ -123,5 +123,14 @@ public class DogController {
             return Result.error("500", e.getMessage());
         }
     }
-
+    @GetMapping("/get/special")
+    public Result getSpecialDogIDs()
+    {
+        try 
+        {   
+            return Result.success(dogService.getSpecialDogIDs());
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
 }

@@ -47,7 +47,7 @@
 
       <!-- Expenses Section -->
       <div v-if="isDogFetched" style="margin-top: 20px;">
-        <h3>Expenses {{ dog.animalControlSurrenderIndicator == 'Yes' ? '(waived)' : ''}}</h3>
+        <h3>Expenses {{ waivedFormatter(dog.animalControlSurrenderIndicator, dog.name, dog.breed) }}</h3>
         <el-table :data="expenses" style="width: 100%" border empty-text="No expenses recorded" v-if="isDogFetched">
           <el-table-column prop="category" label="Category" />
           <el-table-column prop="totalExpense" label="Total Expenses" :formatter="currencyFormatter" />
@@ -283,6 +283,15 @@ const alterationStatusFormatter = (cellValue) => {
         return "NOT ALTERED"
     }
 }
+
+const waivedFormatter = (animalControlSurrenderIndicator, name, breed) => {
+  if ((animalControlSurrenderIndicator == 'Yes') || 
+      (name === 'Sideways' && breed && breed.toLowerCase().includes('terrier'))) 
+  {
+    return '(waived)';
+  }
+  return '';
+};
 const microchipIDFormatter = (cellValue) => {
     if (cellValue == null) return 'N/A';
     else return cellValue;

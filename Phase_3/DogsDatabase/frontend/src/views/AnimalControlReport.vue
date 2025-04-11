@@ -93,7 +93,7 @@
                   label="Expenses" 
                   width="200">
                   <template #default="{ row }">
-                    ${{ formatCurrency(row.totalExpenses) }} {{ row.animalControlSurrenderIndicator == 'Yes' ? '(waived)' : '' }}
+                    ${{ formatCurrency(row.totalExpenses) }} {{ waivedFormatter(row.dogID, row.animalControlSurrenderIndicator) }}
                   </template>
                 </el-table-column>
               </el-table>
@@ -105,25 +105,44 @@
   </template>
   
   <script setup>
-  import { ref, computed, onMounted } from 'vue';
+  import { ref, computed, onMounted, reactive} from 'vue';
   import { ElTable, ElTableColumn, ElLink, ElCard, ElCollapseTransition, ElIcon } from 'element-plus';
   import { ArrowDown } from '@element-plus/icons-vue';
   import request from "@/utils/request.js";
+  const loading = ref(false);
   const activeDrilldown = ref({
     column: null,
     yearMonth: null
   });
-  
+  const specialDogList = reactive([])
+  const waivedFormatter = (currDogID, animalControlSurrenderIndicator) => {
+    if ((animalControlSurrenderIndicator == 'Yes') || (specialDogList.includes(currDogID))) 
+    {
+      return '(waived)';
+    }
+    return '';
+  };
+  async function fetchSpecialDogsIds() {
+    const response = await request.get('/api/dog/get/special');
+    specialDogList.splice(0, specialDogList.length, ...response.data);
+  }
+
   // Use your provided data structure
   const reportData = ref([]);
 
   onMounted(async () => {
     try {
-        const response = await request.get(`/api/report/LACDR`);
-        reportData.value = response.data;
+      loading.value = true;
+      const response = await request.get(`/api/report/LACDR`);
+      reportData.value = response.data;
+      /* Fetch special dogs */
+      await fetchSpecialDogsIds();
     } catch (error) {
         console.error('Error fetching data:', error);
-  }});
+    } finally {
+      loading.value = false;
+    }
+});
 
   const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('en-US', {
