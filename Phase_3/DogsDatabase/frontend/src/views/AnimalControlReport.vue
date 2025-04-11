@@ -91,9 +91,9 @@
                 <el-table-column 
                   v-if="activeDrilldown.column === 'dogsAdoptedExpensesList'"
                   label="Expenses" 
-                  width="120">
+                  width="200">
                   <template #default="{ row }">
-                    ${{ formatCurrency(row.totalExpenses) }}
+                    ${{ formatCurrency(row.totalExpenses) }} {{ row.animalControlSurrenderIndicator == 'Yes' ? '(waived)' : '' }}
                   </template>
                 </el-table-column>
               </el-table>

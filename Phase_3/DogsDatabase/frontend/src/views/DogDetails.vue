@@ -47,7 +47,7 @@
   
       <!-- Expenses Section -->
       <div v-if="isDogFetched" style="margin-top: 20px;">
-        <h3>Expenses</h3>
+        <h3>Expenses {{ dog.animalControlSurrenderIndicator == 'Yes' ? '(waived)' : ''}}</h3>
         <el-table :data="expenses" style="width: 100%" border empty-text="No expenses recorded" v-if="isDogFetched">
           <el-table-column prop="category" label="Category" />
           <el-table-column prop="totalExpense" label="Total Expenses" :formatter="currencyFormatter" />
