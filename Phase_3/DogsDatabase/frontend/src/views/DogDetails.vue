@@ -39,13 +39,12 @@
       </el-descriptions>
       <div>
         <el-button type="success" @click="backToDashBoard" style="margin-top: 10px;">Back to Dashboard</el-button>
-        <el-button type="success" @click="addAdoptionClick" style="margin-top: 10px;">Add Adoption</el-button>
       </div>
       <!-- Conditional Add Adoption -->
       <div v-if="canAddAdoption" style="margin-top: 10px;">
         <el-button type="success" @click="handleAddAdoption">Add Adoption</el-button>
       </div>
-  
+
       <!-- Expenses Section -->
       <div v-if="isDogFetched" style="margin-top: 20px;">
         <h3>Expenses {{ dog.animalControlSurrenderIndicator == 'Yes' ? '(waived)' : ''}}</h3>
@@ -53,11 +52,11 @@
           <el-table-column prop="category" label="Category" />
           <el-table-column prop="totalExpense" label="Total Expenses" :formatter="currencyFormatter" />
         </el-table>
-  
+
         <div v-if="isDogFetched" style="text-align: right; margin-top: 10px; font-weight: bold; margin-right: 10px;">
           Grand Total: ${{ dog.grandTotal }}
         </div>
-  
+
         <!-- Button aligned to the right -->
         <div style="text-align: right; margin-top: 10px; margin-right: 10px;">
         <el-button v-if= "isDogFetched" type="primary" @click="handleAddExpenseBtn">Add Expense</el-button>
@@ -167,7 +166,7 @@
   </el-dialog>
 
 </template>
-  
+
 <script setup>
 import { computed, ref , onMounted} from 'vue'
 import request from "@/utils/request.js";
@@ -317,19 +316,9 @@ const backToDashBoard = () => {
     path: '/dashboard'
   })
 }
-
-const addAdoptionClick = () => {
-  router.push({
-    path: '/addAdoption',
-    query: {
-      dogID: dogid,
-    }
-  })
-}
-
 // Actions
 function handleAddExpenseBtn() {
-  showForm.value = true
+showForm.value = true
 }
 
 const handleAddAdoption = () => {
@@ -345,22 +334,22 @@ function udpateAdoptability()
   canAddAdoption.value = (user.userType == 'EXECUTIVEDIRECTOR' && dog.value.microchipID != null && dog.value.alterationStatus == true && dog.value.adoptionDate == null && dog.value.adoptionState == false);
 }
 
-function resetForm(){
+  function resetForm(){
     form.value.amount = null;
     form.value.date = '';
     form.value.vendorName = '';
     form.value.category = ''
-}
+  }
 
-function formatDate(date) {
+  function formatDate(date) {
   const d = new Date(date);
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
-}
-async function submitExpenseForm()
-{
+  }
+  async function submitExpenseForm()
+  {
     const formdata = {
         dogID:dogid,
         vendorName: form.value.vendorName,
@@ -401,30 +390,30 @@ async function submitExpenseForm()
           console.error('Failed to fetch data:', error)
       }
     }
-}
-const form = ref({
+  }
+  const form = ref({
   amount: null,
   date: '',
   vendorName: '',
   category: ''
-})
-const microchipForm = ref({
+  })
+  const microchipForm = ref({
   microchipID: '',
   manufactureName : ''
-})
-const breedForm = ref({
+  })
+  const breedForm = ref({
   selectedBreeds: []
-})
+  })
 
-// list read from api
-const categories = ref([])
-const microchipVendors = ref([])
-const dogBreeds = ref([])
+  // list read from api
+  const categories = ref([])
+  const microchipVendors = ref([])
+  const dogBreeds = ref([])
 
-function wait(ms) {
+  function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-const rules = {
+  }
+  const rules = {
   amount: [
     { required: true, message: 'Please enter the amount', trigger: 'change' }
   ],
@@ -437,10 +426,10 @@ const rules = {
   category: [
     { required: true, message: 'Please select a category', trigger: 'change' }
   ]
-}
+  }
 
-async function setDogAlterationStatus(dogID)
-{
+  async function setDogAlterationStatus(dogID)
+  {
 
   //Call API to update alteration status
   try {
@@ -454,9 +443,9 @@ async function setDogAlterationStatus(dogID)
   } catch (error) {
     console.error('Failed to fetch data:', error)
   }
-}
-async function addMicrochip(dogID)
-{
+  }
+  async function addMicrochip(dogID)
+  {
   //Call API to update alteration status
   const formdata = {
     dogID:dogid,
@@ -492,10 +481,10 @@ async function addMicrochip(dogID)
       console.error('Failed to fetch data:', error)
     }
   }
-}
+  }
 
-async function addBreeds(dogID)
-{
+  async function addBreeds(dogID)
+  {
   const formdata = {
     dogID: dogid,
     updatedBreeds: breedForm.value.selectedBreeds
@@ -518,29 +507,29 @@ async function addBreeds(dogID)
       console.error('Failed to fetch data:', error)
     }
   }
-}
-const successfulMsg = (text) => {
+  }
+  const successfulMsg = (text) => {
   ElMessage({
     message: text,
     type: 'success',
     plain: true,
   })
-}
-const errorMsg = (text) => {
+  }
+  const errorMsg = (text) => {
   ElMessage({
     message: text,
     type: 'error',
     plain: true,
   })
-}
-</script>
+  }
+  </script>
 
-<style scoped>
-.update-button {
+  <style scoped>
+  .update-button {
   margin-left: 10px;
   background-color: #4CAF50;
   color: white;
   border: none;
   font-weight: bold;
-}
-</style>
+  }
+  </style>
