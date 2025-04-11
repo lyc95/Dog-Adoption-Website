@@ -57,7 +57,7 @@ public class AdoptionApplicationDao {
      * @return 收养申请列表
      */
     public List<AdoptionApplicationPO> getAllAdoptionApplications() {
-        String sql = "SELECT * FROM adoptionapplication";
+        String sql = "SELECT * FROM adoptionapplication ORDER BY application_date DESC";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             AdoptionApplicationPO application = new AdoptionApplicationPO();
             application.setEmail(rs.getString("email"));
@@ -113,7 +113,8 @@ public class AdoptionApplicationDao {
                 FROM rejectedapplication r 
                 WHERE r.email = aa.email 
                 AND r.application_date = aa.application_date
-            );     
+            )
+            ORDER BY application_date DESC;     
         """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             AdoptionApplicationDisplayVO adoptionApplicationDisplayVO = new AdoptionApplicationDisplayVO();
@@ -147,7 +148,8 @@ public class AdoptionApplicationDao {
         ad.state,
         ad.zipcode
         FROM approvedapplication ap
-        JOIN adopter ad ON ap.email = ad.email;
+        JOIN adopter ad ON ap.email = ad.email
+        ORDER BY application_date DESC;
         """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             AdoptionApplicationDisplayVO adoptionApplicationDisplayVO = new AdoptionApplicationDisplayVO();
@@ -182,7 +184,8 @@ public class AdoptionApplicationDao {
         ad.state,
         ad.zipcode
         FROM rejectedapplication ra
-        JOIN adopter ad ON ra.email = ad.email;
+        JOIN adopter ad ON ra.email = ad.email
+        ORDER BY application_date DESC;
         """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             AdoptionApplicationDisplayVO adoptionApplicationDisplayVO = new AdoptionApplicationDisplayVO();

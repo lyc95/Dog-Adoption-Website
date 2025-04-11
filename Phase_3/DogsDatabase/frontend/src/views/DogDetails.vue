@@ -39,6 +39,7 @@
       </el-descriptions>
       <div>
         <el-button type="success" @click="backToDashBoard" style="margin-top: 10px;">Back to Dashboard</el-button>
+        <el-button type="success" @click="addAdoptionClick" style="margin-top: 10px;">Add Adoption</el-button>
       </div>
       <!-- Conditional Add Adoption -->
       <div v-if="canAddAdoption" style="margin-top: 10px;">
@@ -316,6 +317,16 @@ const backToDashBoard = () => {
     path: '/dashboard'
   })
 }
+
+const addAdoptionClick = () => {
+  router.push({
+    path: '/addAdoption',
+    query: {
+      dogID: dogid,
+    }
+  })
+}
+
 // Actions
 function handleAddExpenseBtn() {
   showForm.value = true

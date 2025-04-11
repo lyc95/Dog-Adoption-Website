@@ -34,7 +34,7 @@ public class ApprovedApplicationDao {
     }
 
     public List<ApprovedApplicationPO> getApprovedApplication(){
-        String sql = "SELECT * FROM approvedapplication WHERE application_state = 'APPROVED'";
+        String sql = "SELECT * FROM approvedapplication WHERE application_state = 'APPROVED' ORDER BY application_date DESC";
         List<ApprovedApplicationPO> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
             ApprovedApplicationPO approvedApplicationPO = new ApprovedApplicationPO();
             approvedApplicationPO.setEmail(rs.getString("email"));
