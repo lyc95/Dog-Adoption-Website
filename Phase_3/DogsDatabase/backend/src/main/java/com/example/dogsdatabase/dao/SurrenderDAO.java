@@ -29,6 +29,20 @@ public class SurrenderDAO {
         }, keyHolder);
         return keyHolder.getKey() != null ?  keyHolder.getKey().intValue() : null;
     }
+
+    public Integer addSurrender(SurrenderType type, String phoneNumber)
+    {
+        Integer surrenderID = addSurrender();
+        if (type == SurrenderType.INDIVIDUAL)
+        {
+            addIndividual(surrenderID, phoneNumber);
+        }
+        else
+        {
+            addLACD(surrenderID, phoneNumber);
+        }
+        return surrenderID;
+    }
     public void addIndividual(Integer generatedKey, String phoneNumber)
     {
         String sql = "INSERT INTO individual(surrenderID, phonenumber) VALUES (?, ?)";

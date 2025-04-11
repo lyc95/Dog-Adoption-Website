@@ -37,7 +37,9 @@
           {{ dog.adoptionState ? 'ADOPTED' : ' NOT ADOPTED' }}
         </el-descriptions-item>
       </el-descriptions>
-      
+      <div>
+        <el-button type="success" @click="backToDashBoard" style="margin-top: 10px;">Back to Dashboard</el-button>
+      </div>
       <!-- Conditional Add Adoption -->
       <div v-if="canAddAdoption" style="margin-top: 10px;">
         <el-button type="success" @click="handleAddAdoption">Add Adoption</el-button>
@@ -45,7 +47,7 @@
   
       <!-- Expenses Section -->
       <div v-if="isDogFetched" style="margin-top: 20px;">
-        <h3>Expenses</h3>
+        <h3>Expenses {{ dog.animalControlSurrenderIndicator == 'Yes' ? '(waived)' : ''}}</h3>
         <el-table :data="expenses" style="width: 100%" border empty-text="No expenses recorded" v-if="isDogFetched">
           <el-table-column prop="category" label="Category" />
           <el-table-column prop="totalExpense" label="Total Expenses" :formatter="currencyFormatter" />
@@ -309,16 +311,24 @@ onMounted(async () => {
 
 const userRole = ref('Executive Director') // Or 'Staff', etc.
 
+const backToDashBoard = () => {
+  router.push({
+    path: '/dashboard'
+  })
+}
 // Actions
 function handleAddExpenseBtn() {
-    showForm.value = true
+  showForm.value = true
 }
 
-function handleAddAdoption() {
-  // to be updated
-    console.log('Added ')
+const handleAddAdoption = () => {
+  router.push({
+    path: '/addAdoption',
+    query: {
+      dogID: dogid,
+    }
+  })
 }
-
 function udpateAdoptability()
 {
   canAddAdoption.value = (user.userType == 'EXECUTIVEDIRECTOR' && dog.value.microchipID != null && dog.value.alterationStatus == true && dog.value.adoptionDate == null && dog.value.adoptionState == false);

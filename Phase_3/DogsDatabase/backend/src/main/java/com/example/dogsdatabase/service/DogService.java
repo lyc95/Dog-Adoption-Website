@@ -11,8 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.dogsdatabase.dao.DogDao;
 import com.example.dogsdatabase.dao.ExpenseDAO;
+import com.example.dogsdatabase.dao.MicrochipDAO;
+import com.example.dogsdatabase.dao.SurrenderDAO;
+import com.example.dogsdatabase.entity.dto.DogDTO;
 import com.example.dogsdatabase.entity.po.BreedPO;
 import com.example.dogsdatabase.entity.po.DogPO;
+import com.example.dogsdatabase.entity.po.MicrochipPO;
+import com.example.dogsdatabase.entity.po.SurrenderType;
 import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogReportVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
@@ -32,7 +37,9 @@ import lombok.RequiredArgsConstructor;
 public class DogService {
 
     private final DogDao dogDao;
+    private final SurrenderDAO surrenderDAO;
     private final ExpenseDAO expenseDAO;
+    private final MicrochipDAO microchipDAO;
     private final JdbcTemplate jdbcTemplate;
 
     public int insertDog(DogVO dog) {
@@ -136,5 +143,34 @@ public class DogService {
             throw new Exception("Error: Empty breeds"); 
         }
         return dogDao.updateDogBreeds(breeds, dogID);
+    }
+    public int addDogWithDetails(DogDTO dogDTO) throws Exception
+    {
+        if (dogDTO.getSurrenderType() != SurrenderType.INDIVIDUAL && dogDTO.getSurrenderType() != SurrenderType.LOCALANIMALCONTROLDEPARTMENT)
+        {
+            throw new Exception("Error: invalid surrender type"); 
+        }
+        // Add surrender
+        int surrenderID = surrenderDAO.addSurrender(dogDTO.getSurrenderType(), dogDTO.getPhonenumber());
+        // Add dog
+        DogVO dogVO = new DogVO();
+        dogVO.setName(dogDTO.getName());
+        dogVO.setSex(dogDTO.getSex());
+        dogVO.setSurrender_date(dogDTO.getSurrenderDate());
+        dogVO.setAge_when_surrender(dogDTO.getAge());
+        dogVO.setAlteration_status(dogDTO.getAlterationStatus());
+        dogVO.setDescription(dogDTO.getDescription());
+        dogVO.setAdoption_state(false);
+        dogVO.setSurrenderID(surrenderID);
+        int dogID = insertDog(dogVO);
+        //Add breeds
+        dogDao.addDogBreeds(dogDTO.getBreed(), dogID);
+        //Add MicroChip
+        if (!dogDTO.getMicrochipID().isEmpty() && !dogDTO.getManufactureName().isEmpty())
+        {
+            MicrochipPO microchipPO = new MicrochipPO(dogDTO.getMicrochipID(), dogID, dogDTO.getManufactureName());
+            microchipDAO.addMicrochip(microchipPO);
+        }
+        return dogID;
     }
 }

@@ -29,7 +29,7 @@ const router = createRouter({
         { path: 'vb', component : VolunteerBirthdays }
       ]
     },
-    {path: '/dogdetails/:dogid', name: 'dogdetails', component: DogDetails},
+    // {path: '/dogdetails/:dogid', name: 'dogdetails', component: DogDetails},
     {path: '/example', name: 'example', component: import('../views/Example.vue')},
     {path: '/notfound', name: 'notfound', component: import('../views/404.vue')},
     {path: '/:pathMatch(.*)', redirect: '/notfound'},

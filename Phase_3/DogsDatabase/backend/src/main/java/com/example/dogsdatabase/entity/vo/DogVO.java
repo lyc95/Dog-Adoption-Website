@@ -1,11 +1,16 @@
 package com.example.dogsdatabase.entity.vo;
 
-import com.example.dogsdatabase.entity.po.Sex;
-import lombok.Data;
-
 import java.time.LocalDate;
 
+import com.example.dogsdatabase.entity.po.Sex;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DogVO {
     private Integer dogID;       // 自增主键 
     private String name;

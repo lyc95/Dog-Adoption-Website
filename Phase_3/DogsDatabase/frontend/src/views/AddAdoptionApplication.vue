@@ -184,8 +184,8 @@ const handleSubmit = async () => {
 
 const resetForm = () => {
   Object.assign(form, {
-    email: form.email,
-    date: form.date,
+    email: '',
+    date: null,
     firstname: '',
     lastname: '',
     street: '',

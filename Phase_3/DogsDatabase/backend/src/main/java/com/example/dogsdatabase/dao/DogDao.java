@@ -1,10 +1,15 @@
 package com.example.dogsdatabase.dao;
 
+import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.example.dogsdatabase.entity.po.BreedPO;
@@ -28,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class DogDao {
     private final JdbcTemplate jdbcTemplate;
 
-    public int insertDog(DogVO dog) {
+    public Integer insertDog(DogVO dog) {
         String tableName = "dog";
         List<Object> params = new ArrayList<>();  // 改用位置参数列表
         StringBuilder columns = new StringBuilder("(");
@@ -86,7 +91,15 @@ public class DogDao {
 
         String sql = "INSERT INTO " + tableName + " " + columns + " VALUES " + values;
 
-        return jdbcTemplate.update(sql,  params.toArray());   // 传递参数数组
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i)); // JDBC is 1-indexed
+            }
+            return ps;
+        }, keyHolder);
+        return keyHolder.getKey() != null ?  keyHolder.getKey().intValue() : -1;
     }
 
     public int updateDog(DogVO dog) {
@@ -255,7 +268,7 @@ public class DogDao {
             dogReportVO.setSurrenderDate(rs.getDate("surrender_date").toLocalDate());
             dogReportVO.setAdoptedDate(rs.getDate("adoption_date").toLocalDate());
             dogReportVO.setAnimalControlSurrenderIndicator(rs.getString("Animal_control_surrender_indicator"));
-            dogReportVO.setTotalExpenses(rs.getBigDecimal("total_expenses"));
+            dogReportVO.setTotalExpenses(rs.getBigDecimal("total_expenses") == null ? BigDecimal.ZERO: rs.getBigDecimal("total_expenses"));
             return dogReportVO;
         }, yearMonth.getYear(), yearMonth.getMonthValue());
         return dogList;
@@ -346,6 +359,20 @@ public class DogDao {
             WHERE dogID = ? AND LOWER(breedname) IN ('mixed', 'unknown')
         """;
         rows += jdbcTemplate.update(sqlToDeleteOutdatedBreed, dogID);
+        return rows;
+    }
+
+    public int addDogBreeds(List<String> breeds, Integer dogID)
+    {
+        int rows = 0;
+        String sql = """
+            INSERT INTO dogbreed(dogID, breedname)
+            VALUES(?, ?)
+        """;
+        for (String breed : breeds)
+        {
+            rows += jdbcTemplate.update(sql, dogID, breed);
+        }
         return rows;
     }
 }
