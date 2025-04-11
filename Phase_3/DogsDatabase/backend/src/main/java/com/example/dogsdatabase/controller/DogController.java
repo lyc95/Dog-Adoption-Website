@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.dogsdatabase.common.Result;
 import com.example.dogsdatabase.entity.dto.BreedUpdateDTO;
+import com.example.dogsdatabase.entity.dto.DogDTO;
 import com.example.dogsdatabase.entity.po.BreedPO;
 import com.example.dogsdatabase.entity.vo.DogDetailsVO;
 import com.example.dogsdatabase.entity.vo.DogVO;
@@ -55,6 +56,17 @@ public class DogController {
     public Result insertDog(@RequestBody DogVO dogVO) {
 
         return Result.success(dogService.insertDog(dogVO));
+    }
+
+    @PostMapping("/addwithdetails")
+    public Result addDogWithDetails(@RequestBody DogDTO dogDTO) 
+    {
+        try {
+            int dogID = dogService.addDogWithDetails(dogDTO);
+            return Result.success(dogID);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
     }
 
     @PutMapping("/update")

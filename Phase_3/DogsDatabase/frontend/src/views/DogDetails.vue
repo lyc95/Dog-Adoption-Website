@@ -37,7 +37,9 @@
           {{ dog.adoptionState ? 'ADOPTED' : ' NOT ADOPTED' }}
         </el-descriptions-item>
       </el-descriptions>
-      
+      <div>
+        <el-button type="success" @click="backToDashBoard" style="margin-top: 10px;">Back to Dashboard</el-button>
+      </div>
       <!-- Conditional Add Adoption -->
       <div v-if="canAddAdoption" style="margin-top: 10px;">
         <el-button type="success" @click="handleAddAdoption">Add Adoption</el-button>
@@ -309,6 +311,11 @@ onMounted(async () => {
 
 const userRole = ref('Executive Director') // Or 'Staff', etc.
 
+const backToDashBoard = () => {
+  router.push({
+    path: '/dashboard'
+  })
+}
 // Actions
 function handleAddExpenseBtn() {
     showForm.value = true
