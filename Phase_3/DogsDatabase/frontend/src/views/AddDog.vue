@@ -228,7 +228,7 @@ const handleRules = () => {
     appliedRules = { ...appliedRules, ...microchipRules };
   }
 
-  if (form.surrenderType === 'Animal Control') {
+  if (form.surrenderType === 'LOCALANIMALCONTROLDEPARTMENT') {
     appliedRules = { ...appliedRules, ...surrenderRules };
   }
 
