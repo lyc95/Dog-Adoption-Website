@@ -45,17 +45,13 @@ public class AuthService {
             }
             systemConfigDao.updateSystemConfig("loggedUser", loginDTO.getEmail());
         }
-
-
-
         return buildLoginVO(user);
     }
 
-    public UserPO logout() {
-        String loggedUser = systemConfigDao.getSystemConfigByName("loggedUser").getConfig_value();
-        UserPO userPo = userDao.getUserByEmail(loggedUser);
+    public UserPO logout(String email) {
+        UserPO userPo = userDao.getUserByEmail(email);
         if(userPo.getUser_type().toString().equals("VOLUNTEER")) { // 用户是VOLUNTEER
-            systemConfigDao.updateSystemConfig("loggedUser", null);
+            systemConfigDao.updateSystemConfig("loggedUser", "");
         }
         return userPo;
     }

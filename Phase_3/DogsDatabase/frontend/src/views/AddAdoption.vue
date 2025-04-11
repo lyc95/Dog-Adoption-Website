@@ -27,7 +27,7 @@
               <div>
                 <span style="font-size: 18px; font-weight: bold;">Adoption Date</span>
                 <el-date-picker
-                    v-model="adoptionDetails.adoption_date"
+                    v-model="confirmDetailsInfo.adoption_date"
                     style="width: 240px; padding: 10px; height: auto"
                     type="date"
                     placeholder="Pick a date"
@@ -146,7 +146,9 @@ export default {
         application_state:null
       },
       isWaived:"",
-      confirmDetailsInfo:{}
+      confirmDetailsInfo:{
+        adoption_date:null
+      }
 
     }
   },
@@ -196,7 +198,6 @@ export default {
         // 获取lastApplication
         request.get(`/api/approvedApplication/findLatestByEmail/${this.currentRow.email}`).then(res => {
             if (res.data != null) {
-              console.log('res.data != null: ', res.data);
               this.lastApplication.email = res.data.email;
               this.lastApplication.application_date = res.data.application_date;
               this.lastApplication.date_approved = res.data.date_approved;
@@ -205,7 +206,6 @@ export default {
               this.adoptionDetails.email = res.data.email;
               this.adoptionDetails.application_date = res.data.application_date;
             } else {
-              console.log('res.data == null: ', res.data);
               this.lastApplication.email = 'null';
               this.lastApplication.application_date = 'null';
               this.lastApplication.date_approved = 'null';
@@ -219,10 +219,18 @@ export default {
       }
     },
     showConfirm() {
-      this.dialogFormVisible = true;
+
+
 
       this.confirmDetailsInfo = {...this.lastApplication, ...this.adoptionDetails, ...this.confirmDetailsInfo, ...this.currentRow};
       console.log('this.confirmDetailsInfo: ', this.confirmDetailsInfo);
+      if(this.confirmDetailsInfo.adoption_date == null){
+        this.$message.info('Please select adoption date!');
+      }else if(this.confirmDetailsInfo.email == null){
+        this.$message.info('Please select an adopter!');
+      }else{
+        this.dialogFormVisible = true;
+      }
 
     },
     handleConfirm() {
@@ -241,7 +249,7 @@ export default {
       this.$router.push({
         path: '/dogDetails',
         query: {
-          dogID: this.$route.query.dogID, 
+          dogID: this.$route.query.dogID,
         }
       });
     },

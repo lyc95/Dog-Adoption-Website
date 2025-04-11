@@ -1,9 +1,7 @@
 package com.example.dogsdatabase.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.dogsdatabase.entity.dto.LogoutDTO;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.dogsdatabase.common.Result;
 import com.example.dogsdatabase.entity.dto.LoginDTO;
@@ -44,9 +42,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public Result logout(){
+    public Result logout(@RequestBody LogoutDTO logoutDTO){
         try {
-            authService.logout();
+            authService.logout(logoutDTO.getEmail());
         }catch (AuthException e){
             return Result.error(e.getCode(), e.getMsg());
         }
