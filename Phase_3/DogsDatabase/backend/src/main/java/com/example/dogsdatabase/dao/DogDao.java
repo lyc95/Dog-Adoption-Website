@@ -1,5 +1,6 @@
 package com.example.dogsdatabase.dao;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.YearMonth;
@@ -267,7 +268,7 @@ public class DogDao {
             dogReportVO.setSurrenderDate(rs.getDate("surrender_date").toLocalDate());
             dogReportVO.setAdoptedDate(rs.getDate("adoption_date").toLocalDate());
             dogReportVO.setAnimalControlSurrenderIndicator(rs.getString("Animal_control_surrender_indicator"));
-            dogReportVO.setTotalExpenses(rs.getBigDecimal("total_expenses"));
+            dogReportVO.setTotalExpenses(rs.getBigDecimal("total_expenses") == null ? BigDecimal.ZERO: rs.getBigDecimal("total_expenses"));
             return dogReportVO;
         }, yearMonth.getYear(), yearMonth.getMonthValue());
         return dogList;
