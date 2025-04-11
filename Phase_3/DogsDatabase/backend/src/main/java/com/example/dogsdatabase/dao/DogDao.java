@@ -375,4 +375,17 @@ public class DogDao {
         }
         return rows;
     }
+    public List<Integer> getSpecialDogIDs()
+    {
+        String sql = """
+        SELECT DISTINCT(dog.dogID)
+        FROM dog
+        JOIN dogbreed ON dog.dogID = dogbreed.dogID
+        WHERE LOWER(dog.name) = LOWER(?)
+        AND LOWER(dogbreed.breedname) LIKE LOWER(?);        
+        """;
+        String specialName = "Sideways";
+        String specialBreed = "%Terrier%";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("dogID"), specialName, specialBreed);
+    }
 }
