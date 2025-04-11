@@ -4,6 +4,7 @@ import com.example.dogsdatabase.common.Result;
 import com.example.dogsdatabase.entity.po.AdoptionDetailsPO;
 import com.example.dogsdatabase.entity.vo.DogVO;
 import com.example.dogsdatabase.service.AdoptionDetailsService;
+import com.example.dogsdatabase.service.ApprovedApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,17 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/adoptionDetails")
 @RequiredArgsConstructor
 public class AdoptionDetailsController {
+
     private final AdoptionDetailsService adoptionDetailsService;
 
     @PostMapping
     public Result insertAdoptionDetails(@RequestBody AdoptionDetailsPO adoptionDetailsPO) {
-
-        int res;
-        try {
-            res = adoptionDetailsService.insertAdoptionDetails(adoptionDetailsPO);
-        } catch (Exception e) {
-            return Result.error("500", e.getMessage());
-        }
-        return Result.success(res);
+        return Result.success(adoptionDetailsService.insertAdoptionDetails(adoptionDetailsPO));
     }
 }

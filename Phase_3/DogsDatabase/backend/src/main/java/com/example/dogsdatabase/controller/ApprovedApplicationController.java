@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 /**
  * @Title: ApprovedApplicationController
  * @Author ttu
@@ -27,8 +29,13 @@ public class ApprovedApplicationController {
     }
 
     @GetMapping("/getApprovedApplication")
-    public Result getApprovedApplication(){
+    public Result getAllApprovedApplication(){
         return Result.success(approvedApplicationService.getApprovedApplication());
+    }
+
+    @GetMapping("/get/{email}")
+    public Result getApprovedApplicationByEmail(@PathVariable String email,  LocalDate applicationDate){
+        return Result.success(approvedApplicationService.getApprovedApplicationByEmail(email, applicationDate));
     }
 
 }

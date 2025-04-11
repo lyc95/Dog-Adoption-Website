@@ -5,6 +5,7 @@ import com.example.dogsdatabase.entity.po.ApprovedApplicationPO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -26,4 +27,12 @@ public class ApprovedApplicationService {
         return approvedApplicationDao.getApprovedApplication();
     }
 
+
+    public ApprovedApplicationPO getApprovedApplicationByEmail(String email, LocalDate applicationDate) {
+        return approvedApplicationDao.getApprovedApplicationByEmail(email, applicationDate);
+    }
+
+    public Boolean updateApprovedApplication(ApprovedApplicationPO approvedApplicationPO) {
+        return approvedApplicationDao.updateApprovedApplication(approvedApplicationPO);
+    }
 }

@@ -64,27 +64,29 @@
             <div style="padding: 10px;">
               {{data.currentDogNum}}/{{data.spaseSize}}
             </div>
-            <el-button
-                type="primary"
-                @click="updateSpaseClick"
-                :disabled="user.userType !== 'ADMIN'"
-                style="padding: 10px;">Update Spase</el-button>
-            <el-input
-                v-model="data.inputShelterSize"
-                style="width: 240px; padding: 10px;"
-                placeholder="Please input Shelter Size" />
+            <div v-if="user.userType === 'ADMIN'">
+              <el-button
+                  type="primary"
+                  @click="updateSpaseClick"
+                  style="padding: 10px;">Update Spase</el-button>
+              <el-input
+                  v-model="data.inputShelterSize"
+                  style="width: 240px; padding: 10px;"
+                  placeholder="Please input Shelter Size" />
+            </div>
           </el-aside>
           <el-main style="display: flex; justify-content: center; align-items: center">
             <el-button type="primary" @click="addDogClick">Add Dog</el-button>
             <el-button type="primary"
                 @click="addAdoptionApplicationClick"
-                :disabled="user.userType !== 'EXECUTIVEDIRECTOR'">Add Adoption Application</el-button>
+                v-if="user.userType === 'EXECUTIVEDIRECTOR'"
+            >Add Adoption Application</el-button>
             <el-button type="primary"
                 @click="adoptionApplicationReviewClick"
-                :disabled="user.userType !== 'EXECUTIVEDIRECTOR'">Adoption Application Review</el-button>
+                v-if="user.userType === 'EXECUTIVEDIRECTOR'">Adoption Application Review</el-button>
             <el-button type="primary"
                 @click="viewReportsClick"
-                :disabled="user.userType !== 'EXECUTIVEDIRECTOR'">View Reports</el-button>
+                v-if="user.userType === 'EXECUTIVEDIRECTOR'">View Reports</el-button>
             <el-button type="primary" @click="logoutClick">Logout</el-button>
           </el-main>
         </el-container>
@@ -126,17 +128,14 @@
 
           console.log('dog:',dog);
 
+          const surrenderDate = new Date(dog.surrender_date);
+          let currentDate = new Date();
+          console.log('currentDate:',currentDate);
+
+          const dogCurrentMouthAge = getMonthDiff(surrenderDate, currentDate) + dog.age_when_surrender;
           // Calculate age display text
-          const ageInMonths = dog.age_when_surrender; // Assuming dog.age is in months
-          let ageDisplay;
-          if (ageInMonths < 12) {
-            ageDisplay = `${ageInMonths} months`;
-          } else {
-            const years = Math.floor(ageInMonths / 12);
-            const remainingMonths = ageInMonths % 12;
-            console.log('years:', years, 'remainingMonths:', remainingMonths)
-            ageDisplay = `${years} year ${remainingMonths > 0 ? remainingMonths + 'months' : ''}`;
-          }
+          let ageDisplay = AgeFormatter(dogCurrentMouthAge);
+
           // Use object spread to create new reference
           return {
             ...dog,
@@ -164,14 +163,50 @@
 
       const configRes = await request.get('/api/systemConfig/get',  {
         params: { configName: 'ShelterSize'}
-      });
-      data.spaseSize = configRes.data;
+      })
+      data.spaseSize = configRes.data
+
     } catch (mainError) {
       ElMessage.error(' fail load data');
       console.error(' unknown error:', mainError);
     }
 
   };
+
+  // 年龄格式化
+  const AgeFormatter = (cellValue) => {
+    if (cellValue == null) return 'N/A';
+    const years = Math.floor(cellValue / 12);
+    const months = cellValue % 12;
+
+    if (years > 0 && months > 0) {
+      return `${years} year${years > 1 ? 's' : ''} ${months} month${months > 1 ? 's' : ''}`;
+    } else if (years > 0) {
+      return `${years} year${years > 1 ? 's' : ''}`;
+    } else {
+      return `${months} month${months > 1 ? 's' : ''}`;
+    }
+  }
+
+  // 获取月份差
+  function getMonthDiff(date1, date2) {
+    // 获取两日期的年、月
+    const year1 = date1.getFullYear();
+    const year2 = date2.getFullYear();
+    const month1 = date1.getMonth();
+    const month2 = date2.getMonth();
+
+    // 计算基本月份差
+    let months = (year2 - year1) * 12 + (month2 - month1);
+
+    // 如果日期2的日小于日期1的日，则表示不足一个月
+    if (date2.getDate() < date1.getDate()) {
+      months--;
+    }
+
+    return months;
+  }
+
 
 
   // 查看详情
@@ -186,9 +221,13 @@
 
   // 添加狗
   const addDogClick = () => {
-    router.push({
-      path: '/addDog'
-    })
+    if (data.currentDogNum < data.spaseSize){
+      router.push({
+        path: '/addDog'
+      })
+    }else {
+      ElMessage.error("Shelter is full")
+    }
 
   }
 
@@ -220,18 +259,23 @@
   }
 
   // 更新空间
-  const updateSpaseClick = () => {
-    request.put('/api/systemConfig/update', {
-      configName: 'ShelterSize',
-      configValue: data.inputShelterSize
-    }).then(res => {
-      console.log(res)
-      if (res.code === '200') {
-        ElMessage.success("Update Successfully")
-      } else {
-        ElMessage.error(res.msg)
-      }
-    })
+  const updateSpaseClick = async () => {
+    if(data.inputShelterSize >= data.currentDogNum){
+      await request.put('/api/systemConfig/update', {
+        configName: 'ShelterSize',
+        config_value: data.inputShelterSize
+      }).then(async (res) => {
+        console.log(res);
+        if (res.code === '200') {
+          ElMessage.success("Update Successfully")
+          await loadData();
+        } else {
+          ElMessage.error(res.msg)
+        }
+      })
+    }else{
+      ElMessage.error("The shelter size is too small")
+    }
   }
 
   //退出登录

@@ -32,6 +32,7 @@
                     type="date"
                     placeholder="Pick a date"
                     value-format="YYYY-MM-DD"
+                    @change="validateAdoptionDate"
                 />
                 <el-button
                     type="primary"
@@ -85,12 +86,7 @@
   <el-dialog v-model="dialogFormVisible" title="Confirm Adoption Details" width="700">
     <el-row>
       <el-col :span="12">
-        <p>Dog Name: {{confirmDetailsInfo.dogName}}</p>
         <p>Adopter Email: {{confirmDetailsInfo.email}}</p>
-        <p>Adoption Fee: {{confirmDetailsInfo.adoption_fee}} {{isWaived}}</p>
-        <p>Adoption Date: {{confirmDetailsInfo.adoption_date}}</p>
-      </el-col>
-      <el-col :span="12">
         <p>Adopter Phone: {{confirmDetailsInfo.phoneNumber}}</p>
         <p>First Name: {{confirmDetailsInfo.firstname}}</p>
         <p>Last Name: {{confirmDetailsInfo.lastname}}</p>
@@ -99,6 +95,11 @@
         <p>City: {{confirmDetailsInfo.city}}</p>
         <p>State: {{confirmDetailsInfo.state}}</p>
         <p>Zip Code: {{confirmDetailsInfo.zipcode}}</p>
+      </el-col>
+      <el-col :span="12">
+        <p>Dog Name: {{confirmDetailsInfo.dogName}}</p>
+        <p>Adoption Fee: {{confirmDetailsInfo.adoption_fee}} {{isWaived}}</p>
+        <p>Adoption Date: {{confirmDetailsInfo.adoption_date}}</p>
       </el-col>
     </el-row>
     <template #footer>
@@ -126,6 +127,7 @@ export default {
     const dogid = this.$route.query.dogID || null
     return {
       dogId:dogid,
+      dog:{},
       AdopterTableData: [],
       adopterLastName: '',
       loading: false,
@@ -154,6 +156,8 @@ export default {
   },
   methods: {
     async searchByLastName() {
+      // 重置当前行
+      this.currentRow = null;
       // 验证输入
       if (!this.adopterLastName.trim()) {
         this.$message.warning('Please enter a last name')
@@ -219,9 +223,6 @@ export default {
       }
     },
     showConfirm() {
-
-
-
       this.confirmDetailsInfo = {...this.lastApplication, ...this.adoptionDetails, ...this.confirmDetailsInfo, ...this.currentRow};
       console.log('this.confirmDetailsInfo: ', this.confirmDetailsInfo);
       if(this.confirmDetailsInfo.adoption_date == null){
@@ -233,28 +234,38 @@ export default {
       }
 
     },
-    handleConfirm() {
+    async handleConfirm() {
       let adoptionDetailsForm = {
-        dogID: this.confirmDetailsInfo.dogID,
+        dogID: this.dog.dogID,
         email: this.confirmDetailsInfo.email,
         application_date: this.confirmDetailsInfo.application_date,
         adoption_date: this.confirmDetailsInfo.adoption_date,
         adoption_fee: this.confirmDetailsInfo.adoption_fee
       }
       console.log('adoptionDetailsForm: ', adoptionDetailsForm);
-      this.addAdoptionDetails(adoptionDetailsForm);
-      this.dialogFormVisible = false;
-      /* go back to dog details */
-      const router = useRouter()
-      this.$router.push({
-        path: '/dogDetails',
-        query: {
-          dogID: this.$route.query.dogID,
-        }
-      });
+      try {
+        await this.addAdoptionDetails(adoptionDetailsForm);
+        this.dialogFormVisible = false;
+
+        // 确保使用正确的router实例
+        await this.$router.push({
+          path: '/dogDetails',
+          query: {
+            dogID: this.dog.dogID // 直接使用已知的dogID更可靠
+          }
+        });
+      } catch (error) {
+        console.error('操作失败:', error);
+      }
     },
     addAdoptionDetails(form){
       request.post('/api/adoptionDetails', form);
+    },
+    validateAdoptionDate(val) {
+      if (val && this.dog.surrender_date && val < this.dog.surrender_date) {
+        this.$message.error('Adoption date cannot be earlier than surrender date');
+        this.confirmDetailsInfo.adoption_date = null; // 清空选择
+      }
     }
   },
   mounted() {
@@ -268,6 +279,7 @@ export default {
       .then(res => {
         let dog = res.data;
         this.confirmDetailsInfo.dogName = dog.name;
+        this.dog = dog;
         console.log("dog: ", dog);
         if(dog.name == "Sideways" && dog.breed.indexOf("Terrier") != -1){
           this.isWaived = "(Waived)";

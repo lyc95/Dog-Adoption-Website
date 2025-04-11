@@ -68,10 +68,12 @@ public class DogService {
     public List<DogVO> getAllDogs() {
         List<DogVO> dogVOS = new ArrayList<>();
         for (DogPO dogPO : dogDao.getAllDogs()) {
-            DogVO dogVO = new DogVO();
-            BeanUtils.copyProperties(dogPO, dogVO);
-            dogVO.setBreed(getDogBreedName(dogPO.getDogID()));
-            dogVOS.add(dogVO);
+            if(!dogPO.getAdoption_state()){ //若未领养，添加到列表中
+                DogVO dogVO = new DogVO();
+                BeanUtils.copyProperties(dogPO, dogVO);
+                dogVO.setBreed(getDogBreedName(dogPO.getDogID()));
+                dogVOS.add(dogVO);
+            }
         }
         return dogVOS;
     }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -47,5 +48,27 @@ public class ApprovedApplicationDao {
         return results;
     }
 
+    //更新领养申请状态
+    public boolean updateApprovedApplication(ApprovedApplicationPO approvedApplicationPO) {
+        String sql = "UPDATE approvedapplication SET application_state = ? WHERE email = ? AND application_date = ?";
+        int rowsAffected = jdbcTemplate.update(sql,
+                approvedApplicationPO.getApplication_state().name(),
+                approvedApplicationPO.getEmail(),
+                approvedApplicationPO.getApplication_date());
+        return rowsAffected > 0;
+    }
 
+
+
+    public ApprovedApplicationPO getApprovedApplicationByEmail(String email, LocalDate applicationDate) {
+        String sql = "SELECT * FROM approvedapplication WHERE email = ? AND application_date = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{email, applicationDate}, (rs, rowNum) -> {
+            ApprovedApplicationPO approvedApplicationPO = new ApprovedApplicationPO();
+            approvedApplicationPO.setEmail(rs.getString("email"));
+            approvedApplicationPO.setApplication_date(rs.getDate("application_date").toLocalDate());
+            approvedApplicationPO.setApplication_state(ApplicationState.valueOf(rs.getString("application_state")));
+            approvedApplicationPO.setDate_approved(rs.getDate("date_approved").toLocalDate());
+            return approvedApplicationPO;
+        });
+    }
 }

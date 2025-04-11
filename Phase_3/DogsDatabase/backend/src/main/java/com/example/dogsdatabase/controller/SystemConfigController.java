@@ -1,6 +1,7 @@
 package com.example.dogsdatabase.controller;
 
 import com.example.dogsdatabase.common.Result;
+import com.example.dogsdatabase.entity.dto.SystemConfigDTO;
 import com.example.dogsdatabase.service.SystemConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,8 @@ public class SystemConfigController {
     }
 
     @PutMapping("/update")
-    public int updateSystemConfig(String configName, String configValue) {
-        return systemConfigService.updateSystemConfig(configName, configValue);
+    public Result updateSystemConfig(@RequestBody SystemConfigDTO systemConfigDTO) {
+        return Result.success(systemConfigService.updateSystemConfig(systemConfigDTO.getConfigName(), systemConfigDTO.getConfig_value()));
     }
 
 

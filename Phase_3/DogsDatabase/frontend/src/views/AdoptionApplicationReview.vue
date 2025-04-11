@@ -29,9 +29,6 @@
     </el-row>
 
 
-
-
-
     <!-- Application Table -->
     <el-table
       v-if="formatedApplications.length"
