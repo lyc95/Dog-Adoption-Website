@@ -5,17 +5,32 @@
       <div class="card-header">Adoption Application Review</div>
     </template>
 
-    <!-- Tabs for section selection -->
-    <el-button-group class="mb-4">
-      <el-button
-        v-for="tab in tabs"
-        :key="tab.value"
-        :type="activeTab === tab.value ? 'primary' : 'default'"
-        @click="changeTab(tab.value)"
-      >
-        {{ tab.label }}
-      </el-button>
-    </el-button-group>
+    <el-row>
+      <el-col :span="12" >
+        <!-- Tabs for section selection -->
+        <el-button-group class="mb-4">
+          <el-button
+              v-for="tab in tabs"
+              :key="tab.value"
+              :type="activeTab === tab.value ? 'primary' : 'default'"
+              @click="changeTab(tab.value)"
+          >
+            {{ tab.label }}
+          </el-button>
+        </el-button-group>
+      </el-col>
+      <el-col :span="12">
+        <div class="button-bottom" style="text-align: right;">
+          <el-button type="warning" @click="goBackDashboard">
+            Back to Dashboard
+          </el-button>
+        </div>
+      </el-col>
+    </el-row>
+
+
+
+
 
     <!-- Application Table -->
     <el-table
@@ -54,12 +69,6 @@
     <!-- Display when no applications are available -->
     <el-empty v-else description="No Applications" />
 
-    <!-- Back to Dashboard Button -->
-    <div class="button-bottom">
-      <el-button type="warning" @click="goBackDashboard">
-        Back to Dashboard
-      </el-button>
-    </div>
   </el-card>
 </template>
 

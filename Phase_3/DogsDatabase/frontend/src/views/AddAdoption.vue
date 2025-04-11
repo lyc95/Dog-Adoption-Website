@@ -128,7 +128,7 @@ import {ref} from "vue";
 export default {
   data() {
     return {
-      dogId:4,//修改传参
+      dogId:6,//修改传参
       AdopterTableData: [],
       adopterLastName: '',
       loading: false,

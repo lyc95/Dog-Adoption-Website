@@ -14,8 +14,8 @@
             </el-card>
           </el-col>
         </el-row>
-
       </el-header>
+
       <el-main>
         <el-table :data="data.tableData" class="tableSpec" border style="width: 100%">
           <el-table-column prop="dogID" label="ID" width="'auto'" />
@@ -23,7 +23,7 @@
           <el-table-column prop="breed" label="Breed" width="'auto'" />
           <el-table-column prop="sex" label="Sex" width="'auto'" />
           <el-table-column prop="alteration_status" label="Alteration Status" width="'auto'" />
-          <el-table-column prop="age_when_surrender" label="Age" width="'auto'" />
+          <el-table-column prop="ageDisplay" label="Age" width="'auto'" />
           <el-table-column prop="adoption_state" label="Adoption Status" width="'auto'" />
           <el-table-column prop="surrender_date" label="Surrender Date" width="'auto'" />
 
@@ -118,40 +118,54 @@
       const dogsRes = await request.get('/api/dog/all');
 
       // 并行处理所有微芯片查询
-      const enhancedDogs = await Promise.all(dogsRes.data.map(async  (dog, index) => {
+      const enhancedDogs = await Promise.all(dogsRes.data.map(async (dog, index) => {
         try {
-          const microchipRes = await request.get('/api/microchip/get',  {
-            params: { dogID: dog.dogID  }
+          const microchipRes = await request.get('/api/microchip/get', {
+            params: { dogID: dog.dogID }
           });
 
-          // 使用对象扩展符创建新引用
+          console.log('dog:',dog);
+
+          // Calculate age display text
+          const ageInMonths = dog.age_when_surrender; // Assuming dog.age is in months
+          let ageDisplay;
+          if (ageInMonths < 12) {
+            ageDisplay = `${ageInMonths} months`;
+          } else {
+            const years = Math.floor(ageInMonths / 12);
+            const remainingMonths = ageInMonths % 12;
+            console.log('years:', years, 'remainingMonths:', remainingMonths)
+            ageDisplay = `${years} year ${remainingMonths > 0 ? remainingMonths + 'months' : ''}`;
+          }
+          // Use object spread to create new reference
           return {
             ...dog,
             adoption_available_state:
-                dog.alteration_status  && microchipRes.data?.length  > 0
+                dog.alteration_status && microchipRes.data
                     ? 'Available'
-                    : 'Unavailable'
+                    : 'Unavailable',
+            ageDisplay: ageDisplay // Add the formatted age display
           };
         } catch (e) {
-          console.error(` dogID ${dog.dogID}  fail load data:`, e);
-          return { ...dog, adoption_available_state: 'Unavailable' };
+          console.error(`dogID ${dog.dogID} fail load data:`, e);
+          return {
+            ...dog,
+            adoption_available_state: 'Unavailable',
+            ageDisplay: 'Unknown' // Default display when there's an error
+          };
         }
       }));
 
       // 原子化更新数据
       data.tableData  = enhancedDogs;
+      console.log('enhancedDogs:', enhancedDogs)
       //data.currentDogNum 等于enhancedDogs中adoption_state为false的个数
       data.currentDogNum = enhancedDogs.filter(dog => dog.adoption_state === false).length;
-      console.log('currentDogNum:', data.currentDogNum);
 
       const configRes = await request.get('/api/systemConfig/get',  {
         params: { configName: 'ShelterSize'}
       });
-      console.log('configRes:', configRes);
       data.spaseSize = configRes.data;
-
-      console.log('configRes.data2:', configRes.data);
-
     } catch (mainError) {
       ElMessage.error(' fail load data');
       console.error(' unknown error:', mainError);
@@ -223,7 +237,9 @@
 
   //退出登录
   const logoutClick = () => {
-    request.post('/api/auth/logout').then(res => {
+    request.post('/api/auth/logout', {
+      email: user.email,
+    }).then(res => {
       console.log(res)
       if (res.code === '200') {
         sessionStorage.removeItem('user');
@@ -245,10 +261,8 @@
 
 <style scoped>
   .dashboard {
-    display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-size: cover;
     background-image: url('@/assets/imgs/background.png');
   }
