@@ -178,7 +178,7 @@ const baseRules = {
 }
 const surrenderRules = {
   phonenumber: [
-    { pattern: /^\d{3}[- ]?\d{3}[- ]?\d{4}$/, message: 'Please enter a valid phone number', trigger: 'blur' },
+    { pattern: /^[\d-]+$/, message: 'Please enter a valid phone number', trigger: 'blur' },
     { required: true, message: 'Phonenumber is required for Animal Control Department', trigger: 'blur' }
   ]
 }
