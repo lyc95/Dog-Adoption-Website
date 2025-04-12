@@ -155,7 +155,7 @@ export default {
       isWaived:"",
       confirmDetailsInfo:{
         adoption_date:null
-      }
+      },
 
     }
   },
@@ -268,23 +268,29 @@ export default {
       request.post('/api/adoptionDetails', form);
     },
     validateAdoptionDate(val) {
-      if (val && this.dog.surrender_date && val < this.dog.surrender_date) {
-        this.$message.error('Adoption date cannot be earlier than surrender date');
-        this.confirmDetailsInfo.adoption_date = null; // 清空选择
-      }
 
+      //转换日期格式
       let currentDate = new Date();
       let currentDateString = currentDate.getFullYear() + '-' +
           (currentDate.getMonth() + 1).toString().padStart(2, '0') + '-' +
           currentDate.getDate().toString().padStart(2, '0');
 
-      console.log('currentDateString: ', currentDateString);
-      if (val && val.localeCompare(currentDateString) > 0) {
-        this.$message.error('Adoption date cannot be in the future');
+      if (val && val.localeCompare(currentDateString) < 0) {//val(选中日期) > currentDateString
+        this.$message.error('Adoption date cannot be in the past');
         this.confirmDetailsInfo.adoption_date = null; // 清空选择
       }
 
     },
+    //获取dog的LastExpenseDate
+    // async getLastExpenseDate(){
+    //   let res = await request.get(`/api/expense/getall/${this.dogId}`);
+    //   let expenses = await res.data;
+    //   const lastExpenseDate = expenses.reduce((prev, current) => {
+    //     // 比较日期字符串（因为 "YYYY-MM-DD" 可以直接比较字典序）
+    //     return (current.expenseDate > prev.expenseDate) ? current : prev;
+    //   }).expenseDate;
+    //   return lastExpenseDate;
+    // },
     // 查看详情
     viewDetailsClick(){
       this.$router.push({
