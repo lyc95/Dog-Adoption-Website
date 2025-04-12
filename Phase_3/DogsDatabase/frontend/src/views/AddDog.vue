@@ -53,7 +53,7 @@
 
       <!-- Age -->
       <el-form-item label="Age (Months)" prop="age">
-        <el-input-number v-model="form.age" :min="0" :max="30" />
+        <el-input-number v-model="form.age" :min="0" :max="300" />
       </el-form-item>
 
       <!-- Description -->

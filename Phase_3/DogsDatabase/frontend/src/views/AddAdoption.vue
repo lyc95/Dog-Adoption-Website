@@ -298,14 +298,12 @@ export default {
     //   return lastExpenseDate;
     // },
     // 查看详情
-    viewDetailsClick(){
-      this.$router.push({
+    viewDetailsClick() {
+      this.$router.replace({
         path: '/dogDetails',
-        query: {
-          dogID: this.dog.dogID // 直接使用已知的dogID更可靠
-        }
+        query: { dogID: this.dog.dogID }
       });
-      // window.location.reload();
+      // window.location.reload(); // 如果需要强制刷新
     }
   },
   mounted() {
@@ -329,4 +327,5 @@ export default {
       });
   }
 }
+
 </script>
