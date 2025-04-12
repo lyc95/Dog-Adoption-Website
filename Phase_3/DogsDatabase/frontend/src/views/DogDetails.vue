@@ -31,7 +31,7 @@
             </div>
         </el-descriptions-item>
         <el-descriptions-item label="Surrender Date">{{ dog.surrenderDate }}</el-descriptions-item>
-        <el-descriptions-item label="Surrender phone number" v-if="dog.surrenderPhonenumber">
+        <el-descriptions-item label="Surrender phone number" v-if="user.userType == 'EXECUTIVEDIRECTOR' && dog.surrenderPhonenumber">
           {{ dog.surrenderPhonenumber }}
         </el-descriptions-item>
         <el-descriptions-item label="Surrendered by animal control">
