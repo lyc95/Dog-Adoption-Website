@@ -79,7 +79,6 @@
             <el-button type="primary" @click="addDogClick">Add Dog</el-button>
             <el-button type="primary"
                 @click="addAdoptionApplicationClick"
-                v-if="user.userType === 'EXECUTIVEDIRECTOR'"
             >Add Adoption Application</el-button>
             <el-button type="primary"
                 @click="adoptionApplicationReviewClick"
