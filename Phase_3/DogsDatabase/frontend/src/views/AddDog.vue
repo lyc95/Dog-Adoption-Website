@@ -129,7 +129,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from "@/utils/request.js";
 const router = useRouter()
-
+const user = JSON.parse(sessionStorage.getItem('user'))
 // ----------------------- state -----------------------
 const form = reactive({
   name: '',
@@ -318,6 +318,7 @@ const onSubmit = () => {
 
       const response = await request.post(`/api/dog/addwithdetails`, formData);
       const dogid = response.data
+      await request.post(`/api/dog/record/${dogid}/${user.email}`);
       console.log(response)
       if (dogid >= 0)
       {

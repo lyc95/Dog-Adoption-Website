@@ -398,4 +398,12 @@ public class DogDao {
         """;
         return jdbcTemplate.update(sql, sex, dogID);
     }
+    public void record(Integer dogID, String userEmail)
+    {
+        String sql = """
+        INSERT INTO DogUser (dogID, email)
+        VALUES (?, ?); 
+        """;
+        jdbcTemplate.update(sql, dogID, userEmail);
+    }
 }

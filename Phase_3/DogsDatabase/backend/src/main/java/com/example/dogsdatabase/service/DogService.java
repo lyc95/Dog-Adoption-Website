@@ -191,4 +191,8 @@ public class DogService {
             throw new Exception("Error: invalid sex input"); 
         }
     }
+    public void recordDog(Integer dogID, String email)
+    {
+        dogDao.record(dogID, email);
+    }
 }

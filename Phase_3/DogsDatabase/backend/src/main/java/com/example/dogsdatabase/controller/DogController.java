@@ -68,6 +68,16 @@ public class DogController {
             return Result.error("500", e.getMessage());
         }
     }
+    @PostMapping("/record/{dogID}/{email}")
+    public Result recordDog(@PathVariable Integer dogID, @PathVariable String email) 
+    {
+        try {
+            dogService.recordDog(dogID, email);
+            return Result.success(dogID);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
 
     @PutMapping("/update")
     public int updateDog(@RequestBody DogVO dogVO) {

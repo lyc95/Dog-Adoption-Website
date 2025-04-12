@@ -167,6 +167,14 @@ CREATE TABLE `User`
     user_type ENUM('VOLUNTEER', 'EXECUTIVEDIRECTOR', 'ADMIN') NOT NULL,
     PRIMARY KEY (email)
 );
+CREATE TABLE DogUser
+(
+    dogID int NOT NULL,
+    email varchar(255) NOT NULL,
+    PRIMARY KEY (dogID, email),
+    FOREIGN KEY (dogID) REFERENCES Dog (dogID),
+    FOREIGN KEY (email) REFERENCES `User` (email)
+);
 
 -- Load with Users data
 INSERT INTO `User` (email, `password`, birthday, phone_number, firstname, lastname, user_type) VALUES
