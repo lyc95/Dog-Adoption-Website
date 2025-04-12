@@ -59,7 +59,7 @@
 
         <!-- Button aligned to the right -->
         <div style="text-align: right; margin-top: 10px; margin-right: 10px;">
-        <el-button v-if= "isDogFetched" type="primary" @click="handleAddExpenseBtn">Add Expense</el-button>
+        <el-button v-if= "isDogFetched" type="primary" @click="handleAddExpenseBtn" :disabled="isDogAdopted">Add Expense</el-button>
 
         <!-- Form to add expense -->
         <el-dialog title="Add Expense" style="text-align: center;" v-model="showForm" width="800px" @close="resetForm">
@@ -191,12 +191,14 @@ const showAddMicrochipBtn = ref(false)
 const canAddAdoption = ref(false)
 
 const isDogFetched = ref(false)
+const isDogAdopted = ref(false)
 async function fetchDogDetailsData(dogID) {
   try {
     const response = await request.get(`/api/dog/details/${dogID}`)
     dog.value = response.data;
     expenses.value = response.data.dogExpensesList
     isDogFetched.value = true
+    isDogAdopted.value = response.data.adoptionState
     console.log(dog.value)
     if (dog.value.alterationStatus != true) {
       showAlterationStatusBtn.value = true;
