@@ -58,7 +58,7 @@ public class ExpenseService {
         Integer surrenderID = dogPO.getSurrenderID();
         SurrenderVO surrender = surrenderDAO.getSurrender(surrenderID);
         if (surrender.getSurrenderType() == SurrenderType.LOCALANIMALCONTROLDEPARTMENT){
-            return total.multiply(new BigDecimal("0.25"));
+            return total.multiply(new BigDecimal("0.1"));
         } else if (surrender.getSurrenderType() == SurrenderType.INDIVIDUAL){
             return total.multiply(new BigDecimal("1.25"));
         } else {

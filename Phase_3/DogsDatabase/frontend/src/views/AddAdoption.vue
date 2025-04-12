@@ -50,7 +50,7 @@
   <el-divider style="padding: 10px"/>
 
   <el-row style="padding: 10px">
-    <el-col :span="24">
+    <el-col :span="12">
       <span style="font-size: 18px; font-weight: bold;">Search by last name</span>
       <el-input
           v-model="adopterLastName"
@@ -59,6 +59,9 @@
           :prefix-icon="Search"
       />
       <el-button type="primary" @click="searchByLastName">Search</el-button>
+    </el-col>
+    <el-col :span="12" style="padding: 10px; text-align: right">
+      <el-button type="primary" @click="viewDetailsClick">Back to Dog Details</el-button>
     </el-col>
   </el-row>
 
@@ -121,6 +124,8 @@ import { Search } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 import {ref} from "vue";
 import { useRoute , useRouter} from 'vue-router';
+import router from "@/router/index.js";
+
 
 export default {
   data() {
@@ -254,6 +259,7 @@ export default {
             dogID: this.dog.dogID // 直接使用已知的dogID更可靠
           }
         });
+        window.location.reload(); // 这会导致整个应用重新加载
       } catch (error) {
         console.error('操作失败:', error);
       }
@@ -266,6 +272,27 @@ export default {
         this.$message.error('Adoption date cannot be earlier than surrender date');
         this.confirmDetailsInfo.adoption_date = null; // 清空选择
       }
+
+      let currentDate = new Date();
+      let currentDateString = currentDate.getFullYear() + '-' +
+          (currentDate.getMonth() + 1).toString().padStart(2, '0') + '-' +
+          currentDate.getDate().toString().padStart(2, '0');
+
+      console.log('currentDateString: ', currentDateString);
+      if (val && val.localeCompare(currentDateString) > 0) {
+        this.$message.error('Adoption date cannot be in the future');
+        this.confirmDetailsInfo.adoption_date = null; // 清空选择
+      }
+
+    },
+    // 查看详情
+    viewDetailsClick(){
+      this.$router.push({
+        path: '/dogDetails',
+        query: {
+          dogID: this.dog.dogID // 直接使用已知的dogID更可靠
+        }
+      });
     }
   },
   mounted() {
