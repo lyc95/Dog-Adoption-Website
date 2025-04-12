@@ -93,7 +93,7 @@ public class DogService {
         );
 
         // 4. 使用StringJoiner优化字符串拼接（JDK8+）
-        return dogBreeds.isEmpty()  ? "" : String.join(",",  dogBreeds);
+        return dogBreeds.isEmpty()  ? "" : String.join("/",  dogBreeds);
     }
     public List<DogReportVO> getAllDogsSurrenderedByLACDInMonth(YearMonth yearMonth)
     {

@@ -188,7 +188,7 @@ public class DogDao {
     public List<DogReportVO> getAllDogsSurrenderedByLACDInMonth(YearMonth yearMonth)
     {
         String sql = """
-        SELECT dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds
+        SELECT dog.dogID, dog.sex, dog.alteration_status, microchip.microchipID, dog.surrender_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR '/') AS breeds
         FROM dog JOIN localanimalcontroldepartment ON dog.surrenderId = localanimalcontroldepartment.surrenderId
         LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID 
         LEFT JOIN microchip ON dog.dogID = microchip.dogID 
@@ -213,7 +213,7 @@ public class DogDao {
         String sql = """
         SELECT dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date,
         DATEDIFF(adoptiondetails.adoption_date, dog.surrender_date) + 1 AS days_in_rescue,
-        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds
+        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR '/') AS breeds
         FROM dog
         JOIN adoptiondetails ON dog.dogID = adoptiondetails.dogID
         LEFT JOIN dogbreed ON dog.dogID = dogbreed.dogID
@@ -241,7 +241,7 @@ public class DogDao {
     {
         String sql = """
         SELECT dog.dogID, dog.sex, microchip.microchipID, dog.surrender_date, adoptiondetails.adoption_date,  
-        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds, total_expenses,
+        GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR '/') AS breeds, total_expenses,
         CASE  
         WHEN localanimalcontroldepartment.surrenderID IS NOT NULL THEN 'Yes'  
         ELSE 'No'   
@@ -283,7 +283,7 @@ public class DogDao {
             WHEN localanimalcontroldepartment.phonenumber IS NOT NULL THEN localanimalcontroldepartment.phonenumber 
             ELSE individual.phonenumber 
         END AS surrender_phonenumber,
-        adoptiondetails.adoption_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR ', ') AS breeds, 
+        adoptiondetails.adoption_date, GROUP_CONCAT(dogbreed.breedname ORDER BY dogbreed.breedname SEPARATOR '/') AS breeds, 
         CASE  
             WHEN localanimalcontroldepartment.surrenderID IS NOT NULL THEN 'Yes'  
             ELSE 'No'   
