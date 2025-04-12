@@ -13,7 +13,6 @@
           </el-row>
         </template>
 
-<!--        here-->
         <p class="text item">Email: {{lastApplication.email}}</p>
         <p class="text item">Application Date: {{lastApplication.application_date}}</p>
         <p class="text item">Date Approved: {{lastApplication.date_approved}}</p>
@@ -26,6 +25,7 @@
             <el-col :span="12">
               <div>
                 <span style="font-size: 18px; font-weight: bold;">Adoption Date</span>
+<!--                选日期-->
                 <el-date-picker
                     v-model="confirmDetailsInfo.adoption_date"
                     style="width: 240px; padding: 10px; height: auto"
@@ -34,6 +34,7 @@
                     value-format="YYYY-MM-DD"
                     @change="validateAdoptionDate"
                 />
+<!--                confirm按钮-->
                 <el-button
                     type="primary"
                     plain
@@ -67,6 +68,7 @@
 
   <el-row>
     <el-col :span="24" style="padding: 10px">
+<!--      选择Adopter-->
       <el-table
           :data="AdopterTableData"
           style="width: 100%"
@@ -153,9 +155,15 @@ export default {
         application_state:null
       },
       isWaived:"",
-      confirmDetailsInfo:{
-        adoption_date:null
-      },
+      confirmDetailsInfo: {
+        email: null,
+        firstname: null,
+        lastname: null,
+        adoption_date: null,
+        adoption_fee: 0,
+        application_date: null,
+        date_approved: null
+      }
 
     }
   },
@@ -202,33 +210,24 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentRow = val;
-      console.log('val: ', val)
       if (val) {
-        // 获取lastApplication
-        request.get(`/api/approvedApplication/findLatestByEmail/${this.currentRow.email}`).then(res => {
-            if (res.data != null) {
-              this.lastApplication.email = res.data.email;
-              this.lastApplication.application_date = res.data.application_date;
-              this.lastApplication.date_approved = res.data.date_approved;
-              this.lastApplication.application_state = res.data.application_state;
-
-              this.adoptionDetails.email = res.data.email;
-              this.adoptionDetails.application_date = res.data.application_date;
-            } else {
-              this.lastApplication.email = 'null';
-              this.lastApplication.application_date = 'null';
-              this.lastApplication.date_approved = 'null';
-              this.lastApplication.application_state = 'null';
-            }
-
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
+        request.get(`/api/approvedApplication/findLatestByEmail/${val.email}`).then(res => {
+          if (res.data) {
+            // 直接更新 confirmDetailsInfo，避免后续合并
+            this.confirmDetailsInfo = {
+              ...this.confirmDetailsInfo,
+              email: val.email,
+              firstname: val.firstname,
+              lastname: val.lastname,
+              application_date: res.data.application_date,
+              date_approved: res.data.date_approved
+            };
+          }
+        });
       }
     },
     showConfirm() {
-      this.confirmDetailsInfo = {...this.lastApplication, ...this.adoptionDetails, ...this.confirmDetailsInfo, ...this.currentRow};
+      // this.confirmDetailsInfo = {...this.lastApplication, ...this.adoptionDetails, ...this.confirmDetailsInfo, ...this.currentRow};
       console.log('this.confirmDetailsInfo: ', this.confirmDetailsInfo);
       if(this.confirmDetailsInfo.adoption_date == null){
         this.$message.info('Please select adoption date!');
@@ -267,6 +266,7 @@ export default {
     addAdoptionDetails(form){
       request.post('/api/adoptionDetails', form);
     },
+    // 选日期
     validateAdoptionDate(val) {
 
       //转换日期格式
@@ -298,7 +298,7 @@ export default {
           dogID: this.dog.dogID // 直接使用已知的dogID更可靠
         }
       });
-      window.location.reload();
+      // window.location.reload();
     }
   },
   mounted() {

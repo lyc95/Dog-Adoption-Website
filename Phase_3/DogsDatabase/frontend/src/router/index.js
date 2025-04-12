@@ -10,7 +10,7 @@ import DogDetails from '@/views/DogDetails.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {path: '/', name: 'login', component: import('../views/Login.vue')},
+    {path: '/login', name: 'login', component: import('../views/Login.vue')},
     {path: '/dashboard', name: 'Dash Board', component: import('../views/DashBoard.vue')},
     {path: '/dogDetails', name: 'Dog Details', component: import('../views/DogDetails.vue')},
     {path: '/addDog', name: 'Add Dog', component: import('../views/AddDog.vue')},
