@@ -279,7 +279,6 @@ export default {
         this.$message.error('Adoption date cannot be in the past');
         this.confirmDetailsInfo.adoption_date = null; // 清空选择
       }
-
     },
     //获取dog的LastExpenseDate
     // async getLastExpenseDate(){
@@ -299,6 +298,7 @@ export default {
           dogID: this.dog.dogID // 直接使用已知的dogID更可靠
         }
       });
+      window.location.reload();
     }
   },
   mounted() {
