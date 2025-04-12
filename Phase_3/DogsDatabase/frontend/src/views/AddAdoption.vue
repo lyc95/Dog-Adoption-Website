@@ -124,10 +124,6 @@
 <script>
 import { Search } from '@element-plus/icons-vue'
 import request from '@/utils/request'
-import {ref} from "vue";
-import { useRoute , useRouter} from 'vue-router';
-import router from "@/router/index.js";
-
 
 export default {
   data() {
@@ -216,12 +212,23 @@ export default {
             // 直接更新 confirmDetailsInfo，避免后续合并
             this.confirmDetailsInfo = {
               ...this.confirmDetailsInfo,
+              ...this.currentRow,
               email: val.email,
               firstname: val.firstname,
               lastname: val.lastname,
               application_date: res.data.application_date,
-              date_approved: res.data.date_approved
+              date_approved: res.data.date_approved,
+              adoption_fee: this.adoptionDetails.adoption_fee
             };
+
+            this.lastApplication.email = res.data.email;
+            this.lastApplication.application_date = res.data.application_date;
+            this.lastApplication.date_approved = res.data.date_approved;
+            this.lastApplication.application_state = res.data.application_state;
+
+            this.adoptionDetails.email = res.data.email;
+            this.adoptionDetails.application_date = res.data.application_date;
+
           }
         });
       }
@@ -323,22 +330,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.el-row {
-  margin-bottom: 20px;
-}
-
-.el-row:last-child {
-  margin-bottom: 0;
-}
-
-.el-col {
-  border-radius: 4px;
-}
-
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
-}
-</style>

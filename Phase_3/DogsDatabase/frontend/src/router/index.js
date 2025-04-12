@@ -6,7 +6,6 @@ import MonthlyAdoptionReport from '@/views/MonthlyAdoptionReport.vue'
 import ExpenseAnalysis from '@/views/ExpenseAnalysis.vue'
 import VolunteerLookup from '@/views/VolunteerLookup.vue'
 import VolunteerBirthdays from '@/views/VolunteerBirthdays.vue'
-import DogDetails from '@/views/DogDetails.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
