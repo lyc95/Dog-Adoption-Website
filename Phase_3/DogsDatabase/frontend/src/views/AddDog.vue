@@ -91,6 +91,7 @@
             type="date"
             placeholder="Pick a day"
             format="YYYY-MM-DD"
+            :disabled-date="disabledFutureDates"
         />
       </el-form-item>
 
@@ -221,6 +222,12 @@ const handleBreedToggle = (input) => {
     }
   }
 }
+const disabledFutureDates = (date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return date.getTime() > today.getTime();
+}
+
 const handleRules = () => {
   let appliedRules = { ...baseRules };
 
