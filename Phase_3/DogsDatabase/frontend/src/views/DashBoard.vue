@@ -127,6 +127,7 @@
           });
 
           console.log('dog:',dog);
+          console.log('microchipRes:',microchipRes);
 
           const surrenderDate = new Date(dog.surrender_date);
           let currentDate = new Date();
@@ -140,7 +141,7 @@
           return {
             ...dog,
             adoption_available_state:
-                dog.alteration_status && microchipRes.data
+                dog.alteration_status && microchipRes.data.length !== 0
                     ? 'Available'
                     : 'Unavailable',
             ageDisplay: ageDisplay // Add the formatted age display

@@ -280,7 +280,7 @@ const onSubmit = () => {
     const isBulldog = form.breed.some(breed => breed.toLowerCase().includes("bulldog")) || form.breed.includes('Mixed') && form.breed.includes('Unknown')
     const isUga = form.name.trim().toLowerCase() === 'uga'
     if (isBulldog && isUga) {
-      ElMessage.error('Bulldogs cannot be named "Uga". Please choose a different name.')
+      ElMessage.error('Bulldogs cannot be named "Uga". Please enter a different name.')
       return
     }
     if (form.microchipID)
