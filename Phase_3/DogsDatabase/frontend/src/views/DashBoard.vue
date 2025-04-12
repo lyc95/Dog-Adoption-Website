@@ -68,7 +68,7 @@
               <el-button
                   type="primary"
                   @click="updateSpaseClick"
-                  style="padding: 10px;">Update Spase</el-button>
+                  style="padding: 10px;">Update Space</el-button>
               <el-input
                   v-model="data.inputShelterSize"
                   style="width: 240px; padding: 10px;"
@@ -221,7 +221,8 @@
   }
 
   // 添加狗
-  const addDogClick = () => {
+  const addDogClick = async () => {
+    await loadData();
     if (data.currentDogNum < data.spaseSize){
       router.push({
         path: '/addDog'
