@@ -376,6 +376,10 @@ function udpateAdoptability()
     {
       errorMsg('The Expense Date must not eariler than its surrender date !');
     }
+    else if (new Date(formdata.expenseDate) > new Date())
+    {
+      errorMsg('Can not add future expense!');
+    }
     else
     {
       try {
