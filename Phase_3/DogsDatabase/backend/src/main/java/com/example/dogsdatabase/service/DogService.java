@@ -179,4 +179,16 @@ public class DogService {
     {
         return dogDao.getSpecialDogIDs();
     }
+    public int updateSex(Integer dogID, Integer sexBit) throws Exception
+    {
+
+        if (sexBit == 0 || sexBit == 1)
+        {
+            return dogDao.updateSex(dogID, sexBit);
+        }
+        else
+        {
+            throw new Exception("Error: invalid sex input"); 
+        }
+    }
 }

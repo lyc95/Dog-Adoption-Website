@@ -14,6 +14,7 @@
           type="date"
           placeholder="Pick a date"
           style="width: 100%"
+          :disabled-date="disableFutureDates"
         />
       </el-form-item>
 
@@ -96,7 +97,7 @@ const extraRules = {
   street: [{ required: true, message: 'Street is required', trigger: 'blur' }],
   city: [{ required: true, message: 'City is required', trigger: 'blur' }],
   state: [{ required: true, message: 'State is required', trigger: 'blur' }],
-  zipcode: [{ required: true, message: 'Zip code is required', trigger: 'blur' }],
+  zipcode: [{ required: true, message: 'Zip code is required', trigger: 'blur' },{ pattern: /^\d+$/, message: 'Zip code must be numeric', trigger: 'blur' }],
   phone_number: [{ required: true, message: 'Phone number is required', trigger: 'blur' }],
   household_size: [{ required: true, message: 'Household size is required', trigger: 'blur' }]
 }
@@ -147,7 +148,11 @@ const handleEmailBlur = async () => {
     ElMessage.error('Error checking email. Please try again.')
   }
 }
-
+const  disableFutureDates = (date) =>  {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize to start of today
+    return date.getTime() > today.getTime(); // disable if date is in the future
+  }
 const handleSubmit = async () => {
   const isValid = await new Promise((resolve) => {
     formRef.value.validate((valid) => {

@@ -388,4 +388,14 @@ public class DogDao {
         String specialBreed = "%Terrier%";
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("dogID"), specialName, specialBreed);
     }
+    public int updateSex(Integer dogID, Integer sexBit)
+    {
+        String sex = sexBit == 0 ? Sex.Female.name() : Sex.Male.name();
+        String sql = """
+        UPDATE dog
+        SET sex = ?
+        WHERE dogID = ?;       
+        """;
+        return jdbcTemplate.update(sql, sex, dogID);
+    }
 }

@@ -133,4 +133,16 @@ public class DogController {
             return Result.error("500", e.getMessage());
         }
     }
+
+    @PutMapping("/update/sex/{dogID}/{sexBit}")
+    public Result updateSex(@PathVariable("dogID") Integer dogID, @PathVariable("sexBit") Integer sexBit)
+    {
+        try 
+        {
+            int rows = dogService.updateSex(dogID, sexBit);
+            return Result.success(rows);
+        } catch (Exception e) {
+            return Result.error("500", e.getMessage());
+        }
+    }
 }

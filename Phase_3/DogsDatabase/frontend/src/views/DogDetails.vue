@@ -11,7 +11,12 @@
                 <el-button  v-if="showUpdateBreedBtn" @click="dialogBreedFormVisible = true" size="default" type="success" style="width: 100px;">Update</el-button>
             </div>
         </el-descriptions-item> 
-        <el-descriptions-item label="Sex">{{ dog.sex }}</el-descriptions-item>
+        <el-descriptions-item label="Sex">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            {{ dog.sex }}
+            <el-button  v-if="showUpdateSexBtn" @click="dialogSexFormVisible = true" size="default" type="success" style="width: 100px;">Update</el-button>
+          </div>
+        </el-descriptions-item>
         <el-descriptions-item label="Alteration Status">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                 <span>{{ alterationStatusFormatter(dog.alterationStatus) }}</span>
@@ -22,7 +27,7 @@
         <el-descriptions-item label="Microchip ID">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                 <span>{{ microchipIDFormatter(dog.microchipID) }}</span>
-                <el-button v-if="showAddMicrochipBtn" @click="dialogMicrochipFormVisible = true" size="default" type="success" style=" width: 100px;">Add</el-button>
+                <el-button v-if="showAddMicrochipBtn" :disabled="(user.age <= 18)" @click="dialogMicrochipFormVisible = true" size="default" type="success" style=" width: 100px;">Add</el-button>
             </div>
         </el-descriptions-item>
         <el-descriptions-item label="Surrender Date">{{ dog.surrenderDate }}</el-descriptions-item>
@@ -59,7 +64,7 @@
 
         <!-- Button aligned to the right -->
         <div style="text-align: right; margin-top: 10px; margin-right: 10px;">
-        <el-button v-if= "isDogFetched" type="primary" @click="handleAddExpenseBtn" :disabled="isDogAdopted">Add Expense</el-button>
+        <el-button v-if= "isDogFetched" type="primary" @click="handleAddExpenseBtn" :disabled="(isDogAdopted || user.age <= 18)">Add Expense</el-button>
 
         <!-- Form to add expense -->
         <el-dialog title="Add Expense" style="text-align: center;" v-model="showForm" width="800px" @close="resetForm">
@@ -165,8 +170,26 @@
     </template>
   </el-dialog>
 
+  <!-- dishlog to update dog's Sex -->
+  <el-dialog v-model="dialogSexFormVisible" title="Update Dog's Sex" width="500">
+  <el-form :model="sexForm">
+    <el-form-item label="Dog's Sex" :label-width="formLabelWidth">
+      <el-select v-model="sexForm.selectedSex" placeholder="Select sex" style="width: 100%">
+        <el-option label="Male" value="Male" />
+        <el-option label="Female" value="Female" />
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <template #footer>
+    <div class="dialog-footer">
+      <el-button @click="dialogSexFormVisible = false">Cancel</el-button>
+      <el-button type="primary" @click="updateSex(dogid)">
+        Confirm
+      </el-button>
+    </div>
+  </template>
+</el-dialog>
 </template>
-
 <script setup>
 import { computed, ref , onMounted} from 'vue'
 import request from "@/utils/request.js";
@@ -174,11 +197,12 @@ import { useRoute , useRouter} from 'vue-router';
 import { ElMessage } from 'element-plus'
 const router = useRouter()
 const user = JSON.parse(sessionStorage.getItem('user'))
+
 // variables to show dialog
 const alterationStatusdialogVisible = ref(false)
 const dialogMicrochipFormVisible = ref(false)
 const dialogBreedFormVisible = ref(false)
-
+const dialogSexFormVisible = ref(false)
 const route = useRoute();
 const dogid = route.query.dogID;
 const dog = ref({})
@@ -187,6 +211,7 @@ const showForm = ref(false)
 // variables to show Btns
 const showAlterationStatusBtn = ref(false)
 const showUpdateBreedBtn = ref(false)
+const showUpdateSexBtn = ref(false)
 const showAddMicrochipBtn = ref(false)
 const canAddAdoption = ref(false)
 
@@ -210,6 +235,10 @@ async function fetchDogDetailsData(dogID) {
     if (dog.value.breed == null || dog.value.breed.includes("Mixed") || dog.value.breed.includes("Unknown"))
     {
       showUpdateBreedBtn.value = true
+    }
+    if (dog.value.sex == 'Unknown')
+    {
+      showUpdateSexBtn.value = true
     }
     udpateAdoptability();
   } catch (error) {
@@ -407,17 +436,20 @@ function udpateAdoptability()
     }
   }
   const form = ref({
-  amount: null,
-  date: '',
-  vendorName: '',
-  category: ''
+    amount: null,
+    date: '',
+    vendorName: '',
+    category: ''
   })
   const microchipForm = ref({
-  microchipID: '',
-  manufactureName : ''
+    microchipID: '',
+    manufactureName : ''
   })
   const breedForm = ref({
-  selectedBreeds: []
+    selectedBreeds: []
+  })
+  const sexForm = ref({
+    selectedSex: ''
   })
 
   // list read from api
@@ -441,6 +473,32 @@ function udpateAdoptability()
   category: [
     { required: true, message: 'Please select a category', trigger: 'change' }
   ]
+  }
+  async function updateSex(dogID)
+  {
+    // console.log(sexForm)
+    const sex = sexForm.value.selectedSex;
+    if ((sex == 'Female' || sex == 'Male'))
+    {
+      try
+      {
+        const sexBit = (sex === 'Female') ? 0 : 1;
+        console.log(sexBit)
+        await request.put(`/api/dog/update/sex/${dogID}/${sexBit}`);
+        dog.value.sex = sex;
+        showUpdateSexBtn.value = false;
+        dialogSexFormVisible.value = false;
+        successfulMsg('Congrats, The Sex is updated');
+      }
+      catch (error) 
+      {
+        console.error('Failed to fetch data:', error)
+      }
+    }
+    else
+    {
+      errorMsg('Invalid Sex slection!');
+    }
   }
 
   async function setDogAlterationStatus(dogID)
